@@ -1,0 +1,123 @@
+
+    var item: Item!
+    var slideshowImages: [UIImage]?
+    var contentWidth: CGFloat?
+    var contentHeight: CGFloat?
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        self.title = item.itemTitle
+        
+        headerView.nameLabel.text = item.name
+        
+        if item.altName != nil {
+            headerView.altNameLabel.text = item.altName
+        } else {
+            headerView.altNameLabel.text = item.name
+        }
+        
+        let pView = ItemView(frame: headerView.posterView.bounds, posterURL: item.itemPoster!)
+        headerView.posterView.addSubview(pView)
+        
+        //headerView.contentMode = UIViewContentMode.Redraw
+        
+        configureTableView()
+        thumbsSet()
+        
+        if item.thumbsUrl?.count > 0 {
+            NSTimer.scheduledTimerWithTimeInterval(3, target: self, selector: #selector(self.moveToNextPage), userInfo: nil, repeats: true)
+        }
+    }
+    
+    override func viewDidAppear(animated: Bool) {
+        //thumbsSet()
+    }
+    
+    func configureTableView() {
+        tableView.rowHeight = UITableViewAutomaticDimension
+        tableView.estimatedRowHeight = 175.0
+    }
+    
+    // MARK: Slideshow Setup
+    func moveToNextPage (){
+        
+        let pageWidth:CGFloat = CGRectGetWidth(thumbsView.frame)
+        let maxWidth:CGFloat = pageWidth * CGFloat((item.thumbsUrl?.count)!)
+        let contentOffset:CGFloat = self.thumbsView.contentOffset.x
+        
+        var slideToX = contentOffset + pageWidth
+        
+        if  contentOffset + pageWidth == maxWidth{
+            slideToX = 0
+        }
+        self.thumbsView.scrollRectToVisible(CGRectMake(slideToX, 0, pageWidth, CGRectGetHeight(thumbsView.frame)), animated: true)
+    }
+    
+    func thumbsSet() {
+        thumbsView.translatesAutoresizingMaskIntoConstraints = false
+
+        if let thumbs = item.thumbsUrl {
+            contentWidth = headerView.frame.width*CGFloat(item.thumbsUrl!.count)
+            contentHeight = thumbsView.frame.height
+            
+            let contentView = UIView(frame:CGRectMake(0, 0, contentWidth!, contentHeight!))
+            thumbsView.addSubview(contentView)
+            thumbsView.contentSize = CGSizeMake(contentWidth!, contentHeight!)
+            
+            var viewsDict = [String: UIView]()
+            viewsDict["contentView"] = contentView
+            viewsDict["super"] = headerView
+            var horizontal_constraints = "H:|"
+            
+            for thumb in thumbs {
+                let subview = UIImageView()
+                subview.translatesAutoresizingMaskIntoConstraints = false
+                subview.contentMode = .ScaleAspectFill
+                subview.downloadedFrom(thumb)
+                viewsDict["subview_\(thumbs.indexOf(thumb)!)"] = subview
+                contentView.addSubview(subview)
+                
+                horizontal_constraints += "[subview_\(thumbs.indexOf(thumb)!)]"
+                contentView.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|[subview_\(thumbs.indexOf(thumb)!)]|", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: viewsDict))
+            }
+            
+            horizontal_constraints += "|"
+            contentView.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat(horizontal_constraints, options: NSLayoutFormatOptions.AlignAllTop, metrics: nil, views: viewsDict))
+            
+        } else {
+            contentWidth = headerView.frame.width
+            contentHeight = thumbsView.frame.height
+            
+            let contentView = UIView(frame:CGRectMake(0, 0, contentWidth!, contentHeight!))
+            thumbsView.addSubview(contentView)
+            thumbsView.contentSize = CGSizeMake(contentWidth!, contentHeight!)
+            
+            var viewsDict = [String: UIView]()
+            viewsDict["contentView"] = contentView
+            viewsDict["super"] = headerView
+            var horizontal_constraints = "H:|"
+            
+            let thImage = getBiggerThumbLink(item.itemPoster!, sizeIndex: "1")
+            let subview = UIImageView()
+            subview.translatesAutoresizingMaskIntoConstraints = false
+            subview.contentMode = .ScaleAspectFill
+            subview.downloadedFrom(thImage)
+            viewsDict["subview"] = subview
+            contentView.addSubview(subview)
+            
+            horizontal_constraints += "[subview]"
+            contentView.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|[subview]|", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: viewsDict))
+            thumbsView.scrollEnabled = false
+            
+            horizontal_constraints += "|"
+            contentView.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat(horizontal_constraints, options: NSLayoutFormatOptions.AlignAllTop, metrics: nil, views: viewsDict))
+        }
+    }
+    
+//    func addSlide(frame: CGRect, imageUrl: String) {
+//        let thView = ItemView(frame: frame, posterURL: imageUrl)
+//        thView.translatesAutoresizingMaskIntoConstraints = true
+//        thView.contentMode = .ScaleAspectFill
+//        slideshowView.addSubview(thView)
+//    }

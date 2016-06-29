@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>siteUrl</key>
+	<string>fs.to</string>
+	<key>login</key>
+	<string></string>
+	<key>password</key>
+	<string></string>
+	<key>userName</key>
+	<string></string>
+	<key>userPicLink</key>
+	<string></string>
+	<key>sortBy</key>
+	<string>2</string>
+	<key>showHidden</key>
+	<false/>
+	<key>autoplayNext</key>
+	<false/>
+	<key>mainPage</key>
+	<true/>
+	<key>showProgress</key>
+	<false/>
+	<key>mood</key>
+	<string>Any</string>
+	<key>vproduction</key>
+	<string>Any</string>
+	<key>quality</key>
+	<string>Any</string>
+	<key>translation</key>
+	<string>Any</string>
+	<key>genre</key>
+	<string>Any</string>
+	<key>aproduction</key>
+	<string>Any</string>
+</dict>
+</plist>
