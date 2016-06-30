@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		B62C8F7F1D153E92007C45BB /* MainPageItemsRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = B62C8F7E1D153E92007C45BB /* MainPageItemsRow.swift */; };
-		B64EA19B1CE8734C00203971 /* Catalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64EA19A1CE8734C00203971 /* Catalog.swift */; };
 		B64EA19D1CE8AF6100203971 /* DetailHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64EA19C1CE8AF6100203971 /* DetailHeaderView.swift */; };
 		B64F333C1CDDE7A1000D2659 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64F333B1CDDE7A1000D2659 /* Extensions.swift */; };
 		B64F333E1CDDEAEA000D2659 /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64F333D1CDDEAEA000D2659 /* Item.swift */; };
@@ -53,7 +52,6 @@
 
 /* Begin PBXFileReference section */
 		B62C8F7E1D153E92007C45BB /* MainPageItemsRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainPageItemsRow.swift; sourceTree = "<group>"; };
-		B64EA19A1CE8734C00203971 /* Catalog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Catalog.swift; sourceTree = "<group>"; };
 		B64EA19C1CE8AF6100203971 /* DetailHeaderView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetailHeaderView.swift; sourceTree = "<group>"; };
 		B64F333B1CDDE7A1000D2659 /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		B64F333D1CDDEAEA000D2659 /* Item.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Item.swift; sourceTree = "<group>"; };
@@ -129,7 +127,6 @@
 			isa = PBXGroup;
 			children = (
 				B64F333D1CDDEAEA000D2659 /* Item.swift */,
-				B64EA19A1CE8734C00203971 /* Catalog.swift */,
 				B62C8F7E1D153E92007C45BB /* MainPageItemsRow.swift */,
 			);
 			name = Model;
@@ -378,7 +375,6 @@
 				B6EA2E801CE315AE0072A8C8 /* TFHppleElement.m in Sources */,
 				F9DAA9B31D14316C0097321C /* CustomHeaderCell.swift in Sources */,
 				F954E7481CE61D5000DA6689 /* NavigationController.swift in Sources */,
-				B64EA19B1CE8734C00203971 /* Catalog.swift in Sources */,
 				B62C8F7F1D153E92007C45BB /* MainPageItemsRow.swift in Sources */,
 				B667F6201CDF411500BB9BC2 /* LibraryAPI.swift in Sources */,
 				F933EF991D1DB6B200624CD5 /* DetailsCell.swift in Sources */,

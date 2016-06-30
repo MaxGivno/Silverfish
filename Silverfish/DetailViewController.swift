@@ -186,6 +186,9 @@ extension DetailViewController: UITableViewDataSource {
             cell.ratingBar.progress = item.ratingValue!
             cell.upVoteLabel.text = item.upVoteValue!
             cell.downVoteLabel.text = item.downVoteValue!
+            cell.countryLabel.text = item.country
+            cell.directorsName.text = item.director
+            cell.actorsName.text = item.actors
             return cell
         case 1:
             let cell = tableView.dequeueReusableCellWithIdentifier("descriptionCell", forIndexPath: indexPath) as! DescriptionCell
