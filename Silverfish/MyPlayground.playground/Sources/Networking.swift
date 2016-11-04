@@ -3,9 +3,9 @@ import UIKit
 extension String {
     
     func stringByAddingPercentEncodingForURLQueryValue() -> String? {
-        let allowedCharacters = NSCharacterSet(charactersInString: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~")
+        let allowedCharacters = NSCharacterSet(charactersIn: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~")
         
-        return self.stringByAddingPercentEncodingWithAllowedCharacters(allowedCharacters)
+        return self.addingPercentEncoding(withAllowedCharacters: allowedCharacters as CharacterSet)
     }
     
 }
@@ -19,7 +19,7 @@ extension Dictionary {
             return "\(percentEscapedKey)=\(percentEscapedValue)"
         }
         
-        return parameterArray.joinWithSeparator("&")
+        return parameterArray.joined(separator: "&")
     }
     
 }
@@ -38,17 +38,17 @@ var headers = [
 
 var httpSiteUrl: String {
 get {
-    return "http://" + siteUrl
+    return "https://" + siteUrl
 }
 }
 
 func getFullUrl(url: String) -> String {
     var url : String = url
     if url.hasPrefix("//") {
-        url = "http:" + url
+        url = "https:" + url
     }
     
-    if (url.rangeOfString("://") == nil) {
+    if (url.range(of: "://") == nil) {
         url = httpSiteUrl + url
     }
     return url
@@ -59,9 +59,9 @@ func matchesForRegexInText(regex: String, text: String) -> [String] {
     do {
         let regex = try NSRegularExpression(pattern: regex, options: [])
         let nsString = text as NSString
-        if let match = regex.firstMatchInString(text, options: [], range: NSMakeRange(0, nsString.length)) {
+        if let match = regex.firstMatch(in: text, options: [], range: NSMakeRange(0, nsString.length)) {
             for i in 1..<match.numberOfRanges {
-                result.append(nsString.substringWithRange(match.rangeAtIndex(i)))
+                result.append(nsString.substring(with: match.rangeAt(i)))
             }
         }
     } catch let error as NSError {
@@ -71,25 +71,25 @@ func matchesForRegexInText(regex: String, text: String) -> [String] {
 }
 
 func htmlDecode(html : NSData) -> String {
-    let decodedString = NSString(data: html, encoding: NSUTF8StringEncoding) as! String
+    let decodedString = NSString(data: html as Data, encoding: String.Encoding.utf8.rawValue) as! String
     return decodedString
 }
 
-private func setCookies(response: NSURLResponse) {
-    let cookies = NSHTTPCookieStorage.sharedHTTPCookieStorage().cookiesForURL(response.URL!)
-    print(cookies)
+private func setCookies(response: URLResponse) {
+    let cookies = HTTPCookieStorage.shared.cookies(for: response.url!)
+    print(cookies!)
 }
 
-func HTTPsendRequest(request: NSMutableURLRequest, callback: (String, String?) -> Void) {
-    let configuration = NSURLSessionConfiguration.defaultSessionConfiguration()
-    let session = NSURLSession(configuration: configuration)
-    let task = session.dataTaskWithRequest(request, completionHandler :
+func HTTPsendRequest(request: NSMutableURLRequest, callback: @escaping (String, String?) -> Void) {
+    let configuration = URLSessionConfiguration.default
+    let session = URLSession(configuration: configuration)
+    let task = session.dataTask(with: request as URLRequest, completionHandler :
         {
             data, response, error in
             if error != nil {
                 callback("", (error!.localizedDescription) as String)
             } else {
-                callback(htmlDecode(data!), nil)
+                callback(htmlDecode(html: data! as NSData), nil)
                 //self.setCookies(response!)
             }
     })
@@ -97,21 +97,21 @@ func HTTPsendRequest(request: NSMutableURLRequest, callback: (String, String?) -
     task.resume()
 }
 
-func HTTPGet(url: String, referer: String, postParams: Dictionary<String, AnyObject>?, callback: (String, String?) -> Void) {
+func HTTPGet(url: String, referer: String, postParams: Dictionary<String, AnyObject>?, callback: @escaping (String, String?) -> Void) {
     
-    let request = NSMutableURLRequest(URL: NSURL(string: url)!)
+    let request = NSMutableURLRequest(url: NSURL(string: url)! as URL)
     
     if postParams != nil {
         print("It is POST request")
         let postParamsEncoded = postParams!.stringFromHttpParameters()
-        request.HTTPBody = postParamsEncoded.dataUsingEncoding(NSUTF8StringEncoding)
+        request.httpBody = postParamsEncoded.data(using: String.Encoding.utf8)
         headers["Content-Type"] = "application/x-www-form-urlencoded"
-        request.HTTPMethod = "POST"
-    } else if headers.indexForKey("Content-Type") != nil {
+        request.httpMethod = "POST"
+    } else if headers.index(forKey: "Content-Type") != nil {
         print("It is GET request")
         //headers["Content-Type"] = nil
-        headers.removeValueForKey("Content-Type")
-        request.HTTPMethod = "GET"
+        headers.removeValue(forKey: "Content-Type")
+        request.httpMethod = "GET"
     }
     
     request.addValue(referer, forHTTPHeaderField: "Referer")
@@ -119,5 +119,5 @@ func HTTPGet(url: String, referer: String, postParams: Dictionary<String, AnyObj
         request.setValue(value, forHTTPHeaderField: index)
     }
     
-    HTTPsendRequest(request, callback: callback)
+    HTTPsendRequest(request: request, callback: callback)
 }

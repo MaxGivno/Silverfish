@@ -17,6 +17,11 @@ internal var httpSiteUrl: String {
 
 func getFullUrl(url: String) -> String {
     var url : String = url
+    
+    if url.hasPrefix("http:") {
+        url = String(url.replaceRange(url.rangeOfString("http:")!, with: "https:"))
+    }
+    
     if url.hasPrefix("//") {
         url = "https:" + url
     }

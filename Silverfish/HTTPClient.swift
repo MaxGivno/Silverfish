@@ -44,6 +44,8 @@ class HTTPClient {
     
     func HTTPGet(url: String, referer: String?, postParams: Dictionary<String, AnyObject>?, callback: (NSData?, String?) -> Void) {
         
+        print(url)
+        
         let request = NSMutableURLRequest(URL: NSURL(string: url)!)
         
         if postParams != nil {
