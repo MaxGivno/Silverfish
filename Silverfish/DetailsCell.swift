@@ -15,9 +15,6 @@ class DetailsCell: UITableViewCell {
     @IBOutlet weak var ratingBar: UIProgressView!
     @IBOutlet weak var upVoteLabel: UILabel!
     @IBOutlet weak var downVoteLabel: UILabel!
-    @IBOutlet weak var countryLabel: UILabel!
-    @IBOutlet weak var directorsName: UILabel!
-    @IBOutlet weak var actorsName: UILabel!
     
 
     override func awakeFromNib() {

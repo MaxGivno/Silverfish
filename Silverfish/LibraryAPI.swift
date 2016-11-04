@@ -452,38 +452,6 @@ class LibraryAPI: NSObject {
                             item.genre = (genres.joinWithSeparator(", ")).capitalizedString
                         }
                         
-                        if item.itemLink!.containsString("serials") {
-                            let countryNodes = itemInfo.searchWithXPathQuery("//tr[4]/td[2]/a/span") as! [TFHppleElement]
-                            var countries = [String]()
-                            for country in countryNodes {
-                                countries.append(country.text())
-                            }
-                            item.country = countries.joinWithSeparator(", ")
-                        } else {
-                            let countryNodes = itemInfo.searchWithXPathQuery("//tr[3]/td[2]/a/span") as! [TFHppleElement]
-                            var countries = [String]()
-                            for country in countryNodes {
-                                countries.append(country.text())
-                            }
-                            item.country = countries.joinWithSeparator(", ")
-                        }
-                        
-                        if let directorNodes = itemInfo.searchWithXPathQuery("//span[@itemprop='director']/a/span") as? [TFHppleElement] {
-                            var directors = [String]()
-                            for director in directorNodes {
-                                directors.append(director.text())
-                            }
-                            item.director = directors.joinWithSeparator(", ")
-                        }
-                        
-                        if let actorNodes = itemInfo.searchWithXPathQuery("//span[@itemprop='actor']/a/span") as? [TFHppleElement] {
-                            var actors = [String]()
-                            for actor in actorNodes {
-                                actors.append(actor.text())
-                            }
-                            item.actors = actors.joinWithSeparator(", ")
-                        }
-                        
                         if let rating = itemInfo.searchWithXPathQuery("//meta[@itemprop='ratingValue']/@content").first {
                             item.ratingValue = Float(rating.text())!/10
                         }
@@ -577,15 +545,7 @@ class LibraryAPI: NSObject {
                     } else if let folderList = doc.searchWithXPathQuery("//*[starts-with(@class,'filelist')]").last as? TFHppleElement {
                         isFilelist = false
                         // get folderId
-                        for folder in folderList.children {
-                            // Get folder 
-                            
-                            
-                            var identifier: String!
-                            identifier = (folder.searchWithXPathQuery("//div[2]/a[1]").last as! TFHppleElement).attributes["name"] as! String
-                            identifier = identifier.stringByReplacingOccurrencesOfString("fl", withString: "")
-                            item.folderId = identifier;
-                        }
+                        
                     }
                     
                     

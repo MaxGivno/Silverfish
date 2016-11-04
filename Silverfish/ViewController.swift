@@ -59,7 +59,7 @@ class ViewController: UITableViewController {
             print("Login/Password is not set.")
             return
         } else {
-            libAPI.httpGET(httpSiteUrl + "/login.aspx", referer: httpSiteUrl, postParams: ["login": login, "passwd": password, "remember": "on"]){
+            libAPI.httpGET(httpSiteUrl + "/login.aspx", referer: httpSiteUrl, postParams: ["login": login as AnyObject, "passwd": password as AnyObject, "remember": "on"]){
                 (data, error) -> Void in
                 if error != nil {
                     self.title = "No Connection!"
