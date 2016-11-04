@@ -513,10 +513,11 @@ class LibraryAPI: NSObject {
     
     func readDirectory(item: Item) {
         let folderUrl = getFullUrl(item.itemLink!)
-        let getUrl = "\(folderUrl)?ajax&folder=\(item.folderId)"
-        let isFilelist = false
+        var isFilelist = false
         
         while isFilelist == false {
+            let getUrl = "\(folderUrl)?ajax&folder=\(item.folderId)"
+            
             httpGET(getUrl, referer: httpSiteUrl, postParams: nil) { (data, error) in
                 if error != nil {
                     print(error)
@@ -531,7 +532,94 @@ class LibraryAPI: NSObject {
                         }
                     }
                     
+                    if let filelist = doc.searchWithXPathQuery("ul[@class='filelist m-current']").last as? TFHppleElement {
+                        isFilelist = true
+                        
+                        if let files = filelist.searchWithXPathQuery("//li[contains(@class, 'video-hdrip')]") as? [TFHppleElement] {
+                            for file in files {
+                                // get links & sizes
+                            }
+                            
+                        }
+                        
+                    } else if let folderList = doc.searchWithXPathQuery("//*[starts-with(@class,'filelist')]").last as? TFHppleElement {
+                        isFilelist = false
+                        // get folderId
+                        
+                    }
                     
+                    
+//                    for folder in folderList.children {
+//                        guard let classValue = folder.attributes["class"] as? String else { continue }
+//                        if classValue.hasPrefix("folder") {
+//                            
+//                            // only root folders contains 'header' tag
+//                            let isRootFolder = folder.childrenWithClassName("header").count > 0
+//                            
+//                            // identifier
+//                            var identifier: String!
+//                            identifier = (folder.searchWithXPathQuery("//div[2]/a[1]").last as! TFHppleElement).attributes["name"] as! String
+//                            identifier = identifier.stringByReplacingOccurrencesOfString("fl", withString: "")
+//                            item.folderId = identifier;
+//
+//                            
+//                            // quality
+//                            if (isRootFolder) {
+//                                folder.videoQuality = VideoQuality.Undefined
+//                            } else {
+//                                let qualityString = (folder.searchWithXPathQuery("//div[1]").last as! TFHppleElement).attributes["class"] as! String
+//                                if ((qualityString as NSString).rangeOfString("m-hd").location != NSNotFound) {
+//                                    folder.videoQuality = VideoQuality.HD
+//                                } else if ((qualityString as NSString).rangeOfString("m-sd").location != NSNotFound) {
+//                                    folder.videoQuality = VideoQuality.SD
+//                                } else {
+//                                    folder.videoQuality = VideoQuality.Undefined
+//                                }
+//                            }
+//                            
+//                            // language
+//                            if (isRootFolder) {
+//                                folder.language = VideoLanguage.Undefined
+//                            } else {
+//                                let languageString = (folder.searchWithXPathQuery("//div[2]/a[1]").last as! TFHppleElement).attributes["class"] as! String
+//                                if ((languageString as NSString).rangeOfString("m-en").location != NSNotFound) {
+//                                    folder.language = VideoLanguage.EN
+//                                } else if ((languageString as NSString).rangeOfString("m-ru").location != NSNotFound) {
+//                                    folder.language = VideoLanguage.RU
+//                                } else if ((languageString as NSString).rangeOfString("m-ua").location != NSNotFound) {
+//                                    folder.language = VideoLanguage.UA
+//                                } else {
+//                                    folder.language = VideoLanguage.Undefined
+//                                }
+//                            }
+//                            
+//                            folder.details = (folder.childrenWithClassName("material-details").first as! TFHppleElement).text()
+//                            folder.size = (folder.childrenWithClassName("material-details").last as! TFHppleElement).text()
+//                            folder.dateString = (folder.childrenWithClassName("material-date").last as! TFHppleElement).text()
+//                            
+//                            items.append(folder)
+//                        } else if (classValue as NSString).rangeOfString("file").location != NSNotFound {
+//                            let file = File()
+//                            
+//                            file.name = (folder.searchWithXPathQuery("//span/span").last as! TFHppleElement).text()
+//                            file.size = (folder.searchWithXPathQuery("//a/span").last as! TFHppleElement).text()
+//                            
+//                            let typeString = folder.attributes["class"] as! String
+//                            if ((typeString as NSString).rangeOfString("m-file-new_type_video").location != NSNotFound) {
+//                                file.type = FileType.Video
+//                            } else if ((typeString as NSString).rangeOfString("m-file-new_type_audio").location != NSNotFound) {
+//                                file.type = FileType.Audio
+//                            } else {
+//                                file.type = FileType.Undefined
+//                            }
+//                            
+//                            let pathComponent = (folder.searchWithXPathQuery("//a").last as! TFHppleElement)["href"] as! String
+//                            let fileURL = NSURL(scheme: "http", host: "brb.to", path: pathComponent)
+//                            file.URL = fileURL
+//                            
+//                            items.append(file)
+//                        }
+//                    }
                 }
             }
         }
