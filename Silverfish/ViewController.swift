@@ -80,7 +80,7 @@ class ViewController: UITableViewController {
         libAPI.httpGET(httpSiteUrl + "/logout.aspx", referer: httpSiteUrl, postParams: nil) {
             (data, error) -> Void in
             if error != nil {
-                print(error)
+                print(error!)
             } else {
                 //let queue: dispatch_queue_t = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)
                 DispatchQueue.main.async(execute: {

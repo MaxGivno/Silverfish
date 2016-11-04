@@ -103,7 +103,7 @@ class LibraryAPI: NSObject {
         
         if let imageViewUnWrapped = imageView {
             
-            DispatchQueue.global(priority: DispatchQueue.GlobalQueuePriority.default).async(execute: { () -> Void in
+            DispatchQueue.global().async(execute: { () -> Void in
                 self.httpClient.getImage(coverUrl, callback: { (data, error) in
                     let downloadedImage = UIImage(data: data!)
                     
@@ -116,7 +116,7 @@ class LibraryAPI: NSObject {
     }
     
     func downloadImage(at URL: String, success: ((UIImage) -> ())? ) {
-        DispatchQueue.global(priority: DispatchQueue.GlobalQueuePriority.default).async(execute: { () -> Void in
+        DispatchQueue.global().async(execute: { () -> Void in
             self.httpClient.getImage(URL, callback: { (data, error) in
                 let downloadedImage = UIImage(data: data!)
                 defer {
@@ -160,7 +160,7 @@ class LibraryAPI: NSObject {
         let parameters = "search.aspx?search=\(encodedSearchQuery)"
         let searchUrl = httpSiteUrl + "/" + parameters
         
-        DispatchQueue.global(priority: DispatchQueue.GlobalQueuePriority.default).async { () -> Void in
+        DispatchQueue.global().async { () -> Void in
             self.httpGET(searchUrl, referer: httpSiteUrl, postParams: nil) { (data, error) in
                 if error != nil {
                     print(">>> Error getting data: \(error)")
@@ -203,10 +203,10 @@ class LibraryAPI: NSObject {
     }
     
     func getMainItemsRow(at URL: String, success: (([Item]) -> ())? ) {
-        DispatchQueue.global(priority: DispatchQueue.GlobalQueuePriority.default).async { () -> Void in
+        DispatchQueue.global().async { () -> Void in
             self.httpGET(httpSiteUrl + URL, referer: httpSiteUrl, postParams: nil) { (data, error) in
                 if error != nil {
-                    print(error)
+                    print(error!)
                     return
                 } else {
                     var resultsArray = [Item]()
@@ -249,10 +249,10 @@ class LibraryAPI: NSObject {
     }
     
     func getPopularItems() {
-        DispatchQueue.global(priority: DispatchQueue.GlobalQueuePriority.default).async { () -> Void in
+        DispatchQueue.global().async { () -> Void in
             self.httpGET(httpSiteUrl + "/video/films/?sort=trend", referer: httpSiteUrl, postParams: nil) { (data, error) in
                 if error != nil {
-                    print(error)
+                    print(error!)
                     return
                 } else {
                     let doc = TFHpple(htmlData: data)
@@ -291,10 +291,10 @@ class LibraryAPI: NSObject {
     }
     
     func getNewMovies() {
-        DispatchQueue.global(priority: DispatchQueue.GlobalQueuePriority.default).async { () -> Void in
+        DispatchQueue.global().async { () -> Void in
             self.httpGET(httpSiteUrl + "/video/films/?sort=new", referer: httpSiteUrl, postParams: nil) { (data, error) in
                 if error != nil {
-                    print(error)
+                    print(error!)
                     return
                 } else {
                     let doc = TFHpple(htmlData: data)
@@ -333,10 +333,10 @@ class LibraryAPI: NSObject {
     }
     
     func getNewTVShows() {
-        DispatchQueue.global(priority: DispatchQueue.GlobalQueuePriority.default).async { () -> Void in
+        DispatchQueue.global().async { () -> Void in
             self.httpGET(httpSiteUrl + "/video/serials/?sort=new", referer: httpSiteUrl, postParams: nil) { (data, error) in
                 if error != nil {
-                    print(error)
+                    print(error!)
                     return
                 } else {
                     let doc = TFHpple(htmlData: data)
@@ -375,10 +375,10 @@ class LibraryAPI: NSObject {
     }
     
     func getFavorites() {
-        DispatchQueue.global(priority: DispatchQueue.GlobalQueuePriority.default).async { () -> Void in
+        DispatchQueue.global().async { () -> Void in
             self.httpGET(httpSiteUrl + "/myfavourites.aspx?page=inprocess", referer: httpSiteUrl, postParams: nil) { (data, error) in
                 if error != nil {
-                    print(error)
+                    print(error!)
                     return
                 } else {
                     if let doc = TFHpple(htmlData: data) {
@@ -414,10 +414,10 @@ class LibraryAPI: NSObject {
     }
     
     func getItemDetails(_ item: Item) {
-        DispatchQueue.global(priority: DispatchQueue.GlobalQueuePriority.default).async { () -> Void in
+        DispatchQueue.global().async { () -> Void in
             self.httpGET(httpSiteUrl + item.itemLink!, referer: httpSiteUrl, postParams: nil) { (data, error) in
                 if error != nil {
-                    print(error)
+                    print(error!)
                     return
                 } else {
                     if let doc = TFHpple(htmlData: data) {
@@ -552,7 +552,7 @@ class LibraryAPI: NSObject {
             
             httpGET(getUrl, referer: httpSiteUrl, postParams: nil) { (data, error) in
                 if error != nil {
-                    print(error)
+                    print(error!)
                     return
                 } else {
                     let doc = TFHpple(htmlData: data)
