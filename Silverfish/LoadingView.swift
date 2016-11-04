@@ -8,39 +8,39 @@
 
 import UIKit
 
-public class LoadingView{
+open class LoadingView{
     
     var overlayView = UIView()
     var activityIndicator = UIActivityIndicatorView()
     
     static var shared = LoadingView()
     
-    public func showOverlay(view: UIView) {
+    open func showOverlay(_ view: UIView) {
         
         //let mainScreen = UIScreen.mainScreen()
         
-        overlayView.frame = CGRectMake(0, 0, view.bounds.width, view.bounds.height)
+        overlayView.frame = CGRect(x: 0, y: 0, width: view.bounds.width, height: view.bounds.height)
         overlayView.center = view.center
-        overlayView.backgroundColor = UIColor.blackColor().colorWithAlphaComponent(0.5)
+        overlayView.backgroundColor = UIColor.black.withAlphaComponent(0.5)
 //        overlayView.clipsToBounds = true
 //        overlayView.layer.cornerRadius = 10
         
-        activityIndicator.frame = CGRectMake(0, 0, 40, 40)
-        activityIndicator.activityIndicatorViewStyle = .WhiteLarge
-        activityIndicator.center = CGPointMake(overlayView.bounds.width / 2, overlayView.bounds.height / 2)
+        activityIndicator.frame = CGRect(x: 0, y: 0, width: 40, height: 40)
+        activityIndicator.activityIndicatorViewStyle = .whiteLarge
+        activityIndicator.center = CGPoint(x: overlayView.bounds.width / 2, y: overlayView.bounds.height / 2)
         
         overlayView.addSubview(activityIndicator)
         view.addSubview(overlayView)
         
-        view.addConstraint(NSLayoutConstraint(item: overlayView, attribute: .Top, relatedBy: .Equal, toItem: view, attribute: .Top, multiplier: 1.0, constant: 0))
-        view.addConstraint(NSLayoutConstraint(item: overlayView, attribute: .Bottom, relatedBy: .Equal, toItem: view, attribute: .Bottom, multiplier: 1.0, constant: 0))
-        view.addConstraint(NSLayoutConstraint(item: overlayView, attribute: .Leading, relatedBy: .Equal, toItem: view, attribute: .Leading, multiplier: 1.0, constant: 0))
-        view.addConstraint(NSLayoutConstraint(item: overlayView, attribute: .Trailing, relatedBy: .Equal, toItem: view, attribute: .Trailing, multiplier: 1.0, constant: 0))
+        view.addConstraint(NSLayoutConstraint(item: overlayView, attribute: .top, relatedBy: .equal, toItem: view, attribute: .top, multiplier: 1.0, constant: 0))
+        view.addConstraint(NSLayoutConstraint(item: overlayView, attribute: .bottom, relatedBy: .equal, toItem: view, attribute: .bottom, multiplier: 1.0, constant: 0))
+        view.addConstraint(NSLayoutConstraint(item: overlayView, attribute: .leading, relatedBy: .equal, toItem: view, attribute: .leading, multiplier: 1.0, constant: 0))
+        view.addConstraint(NSLayoutConstraint(item: overlayView, attribute: .trailing, relatedBy: .equal, toItem: view, attribute: .trailing, multiplier: 1.0, constant: 0))
         
         activityIndicator.startAnimating()
     }
     
-    public func hideOverlayView() {
+    open func hideOverlayView() {
         activityIndicator.stopAnimating()
         overlayView.removeFromSuperview()
     }

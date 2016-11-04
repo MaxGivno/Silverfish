@@ -17,22 +17,22 @@ class ViewController: UITableViewController {
     var searchResults = [Item]()
     //var mainPageItemsCollection: [MainPageItemsRow]?
     
-    lazy private var searchController: UISearchController = {
+    lazy fileprivate var searchController: UISearchController = {
         let searchController = UISearchController(searchResultsController: nil)
         searchController.searchResultsUpdater = self
         searchController.hidesNavigationBarDuringPresentation = true
         searchController.dimsBackgroundDuringPresentation = false
         searchController.searchBar.delegate = self
-        searchController.searchBar.barStyle = .Black
-        searchController.searchBar.searchBarStyle = .Prominent
+        searchController.searchBar.barStyle = .black
+        searchController.searchBar.searchBarStyle = .prominent
         searchController.searchBar.barTintColor = UIColor(red: 48/255, green: 58/255, blue: 74/255, alpha: 1.0)
         
         return searchController
     }()
     
-    private var searchTimer: NSTimer!
+    fileprivate var searchTimer: Timer!
     
-    let defaults = NSUserDefaults.standardUserDefaults()
+    let defaults = UserDefaults.standard
     let libAPI = LibraryAPI.sharedInstance
     var login = ""
     var password = ""
@@ -45,10 +45,10 @@ class ViewController: UITableViewController {
     func setUserName () {
         defaults.synchronize()
         
-        if defaults.stringForKey("userName") != nil || defaults.stringForKey("userName") != "" {
+        if defaults.string(forKey: "userName") != nil || defaults.string(forKey: "userName") != "" {
             //let name = defaults.stringForKey("userName")
             //print("User Name is: \(name)")
-            self.userName = defaults.stringForKey("userName")!
+            self.userName = defaults.string(forKey: "userName")!
         } else {
             print("User Name is not set")
         }
@@ -59,14 +59,14 @@ class ViewController: UITableViewController {
             print("Login/Password is not set.")
             return
         } else {
-            libAPI.httpGET(httpSiteUrl + "/login.aspx", referer: httpSiteUrl, postParams: ["login": login as AnyObject, "passwd": password as AnyObject, "remember": "on"]){
+            libAPI.httpGET(httpSiteUrl + "/login.aspx", referer: httpSiteUrl, postParams: ["login": login as AnyObject, "passwd": password as AnyObject, "remember": "on" as AnyObject]){
                 (data, error) -> Void in
                 if error != nil {
                     self.title = "No Connection!"
-                    print(error)
+                    print(error!)
                     return
                 } else {
-                    dispatch_async(dispatch_get_main_queue(), {
+                    DispatchQueue.main.async(execute: {
                         self.checkLogin()
                     })
                     
@@ -83,10 +83,10 @@ class ViewController: UITableViewController {
                 print(error)
             } else {
                 //let queue: dispatch_queue_t = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)
-                dispatch_async(dispatch_get_main_queue(), {
+                DispatchQueue.main.async(execute: {
                     self.checkLogin()
                     print("Removing user entries...")
-                    self.defaults.removeObjectForKey("userName")
+                    self.defaults.removeObject(forKey: "userName")
                     self.defaults.synchronize()
                 })
             }
@@ -94,20 +94,20 @@ class ViewController: UITableViewController {
     }
     
     func checkLogin() -> Bool {
-        let siteUrl = NSURL(string: httpSiteUrl)!
-        guard let cookies = NSHTTPCookieStorage.sharedHTTPCookieStorage().cookiesForURL(siteUrl) else { return false }
+        let siteUrl = URL(string: httpSiteUrl)!
+        guard let cookies = HTTPCookieStorage.shared.cookies(for: siteUrl) else { return false }
         
         for cookie in cookies {
             if cookie.name == "fs_us" {
-                if self.defaults.stringForKey("userName") == nil || self.defaults.stringForKey("userName") == "" {
-                    let userCreds = cookie.value
-                    let userCredsDecoded = NSData(data: ((userCreds.stringByRemovingPercentEncoding)?.dataUsingEncoding(NSUTF8StringEncoding))!)
+                if self.defaults.string(forKey: "userName") == nil || self.defaults.string(forKey: "userName") == "" {
+                    let userCreds = cookie.value as NSString
+                    let userCredsDecoded = NSData(data: ((userCreds.removingPercentEncoding)?.data(using: String.Encoding.utf8))!) as Data
                     do {
-                        let json = try NSJSONSerialization.JSONObjectWithData(userCredsDecoded, options: .MutableContainers)
+                        let json = try JSONSerialization.jsonObject(with: userCredsDecoded, options: .mutableContainers) as? [String: Any]
                         
-                        let userName = json["l"] as! NSString
+                        let userName = json?["l"] as! NSString
 
-                        defaults.setObject(userName, forKey: "userName")
+                        defaults.set(userName, forKey: "userName")
                         defaults.synchronize()
                         
                     } catch {
@@ -117,19 +117,19 @@ class ViewController: UITableViewController {
                 self.setUserName()
                 self.isLogged = true
                 print("Logged In")
-                self.loginButton.setTitle(self.userName, forState: .Normal)
+                self.loginButton.setTitle(self.userName, for: UIControlState())
                 return true
             }
         }
         self.isLogged = false
         print("Logged Out")
-        self.loginButton.setTitle("Log In", forState: .Normal)
+        self.loginButton.setTitle("Log In", for: UIControlState())
         return false
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(ViewController.reloadMainPageItems(_:)), name:"reload", object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(ViewController.reloadMainPageItems(_:)), name:NSNotification.Name(rawValue: "reload"), object: nil)
         LoadingView.shared.showOverlay(super.view)
         checkLogin()
         
@@ -137,9 +137,9 @@ class ViewController: UITableViewController {
         addLogo()
         tableView.tableFooterView = footerView
         loginButton.layer.borderWidth = 1
-        loginButton.layer.borderColor = UIColor( red: 111/255, green: 113/255, blue:121/255, alpha: 1.0 ).CGColor
+        loginButton.layer.borderColor = UIColor( red: 111/255, green: 113/255, blue:121/255, alpha: 1.0 ).cgColor
 
-        let topView = UIView(frame: CGRectMake(0, -480, 600, 480))
+        let topView = UIView(frame: CGRect(x: 0, y: -480, width: 600, height: 480))
         //topView.backgroundColor = UIColor(red: 48/255, green: 58/255, blue: 74/255, alpha: 1.0)
         topView.backgroundColor = UIColor(red: 31/255, green: 36/255, blue: 44/255, alpha: 1.0)
         tableView.addSubview(topView)
@@ -150,11 +150,11 @@ class ViewController: UITableViewController {
         
         libAPI.loadData()
         //getMainPageItems()
-        tableView.contentOffset = CGPointMake(0, searchController.searchBar.frame.size.height)
+        tableView.contentOffset = CGPoint(x: 0, y: searchController.searchBar.frame.size.height)
     }
     
     deinit {
-        NSNotificationCenter.defaultCenter().removeObserver(self)
+        NotificationCenter.default.removeObserver(self)
     }
     
 //    func getMainPageItems() {
@@ -176,7 +176,7 @@ class ViewController: UITableViewController {
 //        }
 //    }
     
-    private func configureSearchBar() {
+    fileprivate func configureSearchBar() {
         
         let searchBar = self.searchController.searchBar
         searchBar.translatesAutoresizingMaskIntoConstraints = false
@@ -185,9 +185,9 @@ class ViewController: UITableViewController {
         searchBarContainer.addSubview(searchBar)
         
         let views = ["searchBar" : searchBar]
-        searchBarContainer.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("H:|-0-[searchBar]-0-|",
+        searchBarContainer.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|-0-[searchBar]-0-|",
             options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: views))
-        searchBarContainer.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|-0-[searchBar]-0-|",
+        searchBarContainer.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|-0-[searchBar]-0-|",
             options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: views))
         
         //navigationItem.titleView = searchBarContainer
@@ -208,36 +208,36 @@ class ViewController: UITableViewController {
     
     func addLogo() {
         let imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 91, height: 19))
-        imageView.contentMode = .ScaleAspectFit
+        imageView.contentMode = .scaleAspectFit
         let image = UIImage(named: "logo")
         imageView.image = image
         navigationItem.titleView = imageView
     }
     
-    func reloadMainPageItems(notification: NSNotification) {
+    func reloadMainPageItems(_ notification: Notification) {
         self.mainPageItems = libAPI.getMainPageItems()
         reloadTable()
         //LoadingView.shared.hideOverlayView()
     }
     
     func reloadTable() {
-        dispatch_async(dispatch_get_main_queue(), {
+        DispatchQueue.main.async(execute: {
             self.tableView.reloadData()
             LoadingView.shared.hideOverlayView()
         })
     }
     
     //MARK: Navigation
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "detailViewSegue" {
             
             if let cell = sender as? ItemCell {
-                let destination = segue.destinationViewController as! DetailViewController
+                let destination = segue.destination as! DetailViewController
                 destination.item = cell.item
             } else if let cell = sender as? SearchResultCell {
-                let destination = segue.destinationViewController as! DetailViewController
+                let destination = segue.destination as! DetailViewController
                 destination.item = cell.item
-                if searchController.active {
+                if searchController.isActive {
                     searchController.searchBar.resignFirstResponder()
                 }
             }
@@ -245,7 +245,7 @@ class ViewController: UITableViewController {
     }
     
     // MARK: Login Button actions
-    @IBAction func loginButtonPressed(sender: UIButton) {
+    @IBAction func loginButtonPressed(_ sender: UIButton) {
         if self.isLogged {
             showLogoutDialog(self.userName)
         } else {
@@ -253,34 +253,34 @@ class ViewController: UITableViewController {
         }
     }
     
-    func showLoginDialog(message: String) {
-        let myAlert = UIAlertController(title: "Log In", message: message, preferredStyle: UIAlertControllerStyle.Alert)
+    func showLoginDialog(_ message: String) {
+        let myAlert = UIAlertController(title: "Log In", message: message, preferredStyle: UIAlertControllerStyle.alert)
         var loginString = ""
         var passwordString = ""
         
-        myAlert.addTextFieldWithConfigurationHandler { (loginTextField) in
+        myAlert.addTextField { (loginTextField) in
             
-            if self.defaults.stringForKey("login") != nil {
-                loginTextField.text = self.defaults.stringForKey("login")!
+            if self.defaults.string(forKey: "login") != nil {
+                loginTextField.text = self.defaults.string(forKey: "login")!
             } else {
                 loginTextField.placeholder = "Login"
                 loginString = loginTextField.text!
             }
         }
         
-        myAlert.addTextFieldWithConfigurationHandler { (passTextField) in
+        myAlert.addTextField { (passTextField) in
             
-            passTextField.secureTextEntry = true
+            passTextField.isSecureTextEntry = true
             
-            if self.defaults.stringForKey("password") != nil {
-                passTextField.text = self.defaults.stringForKey("password")!
+            if self.defaults.string(forKey: "password") != nil {
+                passTextField.text = self.defaults.string(forKey: "password")!
             } else {
                 passTextField.placeholder = "Password"
                 passwordString = passTextField.text!
             }
         }
         
-        let loginAction = UIAlertAction(title: "Log In", style: UIAlertActionStyle.Default) { (action) in
+        let loginAction = UIAlertAction(title: "Log In", style: UIAlertActionStyle.default) { (action) in
             
             let loginTextField = myAlert.textFields![0] as UITextField
             let passTextField = myAlert.textFields![1] as UITextField
@@ -295,8 +295,8 @@ class ViewController: UITableViewController {
                     return
                 }
                 
-                self.defaults.setObject(loginString, forKey: "login")
-                self.defaults.setObject(passwordString, forKey: "password")
+                self.defaults.set(loginString, forKey: "login")
+                self.defaults.set(passwordString, forKey: "password")
                 self.defaults.synchronize()
                 
                 self.login = loginString
@@ -305,31 +305,31 @@ class ViewController: UITableViewController {
             }
             self.logIn()
         }
-        let cancelAction = UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: nil)
+        let cancelAction = UIAlertAction(title: "Cancel", style: UIAlertActionStyle.cancel, handler: nil)
         
         myAlert.addAction(loginAction)
         myAlert.addAction(cancelAction)
         
-        self.presentViewController(myAlert, animated: true, completion: nil)
+        self.present(myAlert, animated: true, completion: nil)
     }
     
-    func showLogoutDialog(message: String) {
-        let myAlert = UIAlertController(title: "Logged as:", message: message, preferredStyle: UIAlertControllerStyle.Alert)
+    func showLogoutDialog(_ message: String) {
+        let myAlert = UIAlertController(title: "Logged as:", message: message, preferredStyle: UIAlertControllerStyle.alert)
         
-        let logoutAction = UIAlertAction(title: "Log Out", style: UIAlertActionStyle.Default) { (action) in
+        let logoutAction = UIAlertAction(title: "Log Out", style: UIAlertActionStyle.default) { (action) in
             self.logOut()
         }
-        let cancelAction = UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: nil)
+        let cancelAction = UIAlertAction(title: "Cancel", style: UIAlertActionStyle.cancel, handler: nil)
         
         myAlert.addAction(logoutAction)
         myAlert.addAction(cancelAction)
         
-        self.presentViewController(myAlert, animated: true, completion: nil)
+        self.present(myAlert, animated: true, completion: nil)
     }
     
     // MARK: TableView Data Source
-    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        if searchController.active {
+    override func numberOfSections(in tableView: UITableView) -> Int {
+        if searchController.isActive {
             if searchResults.isEmpty {
                 return 0
             }
@@ -348,27 +348,27 @@ class ViewController: UITableViewController {
 //        return mainPageItemsCollection?[section].title
 //    }
     
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if searchController.active {
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if searchController.isActive {
             return searchResults.count
         }
         return 1
     }
     
-    override func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        if searchController.active {
+    override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        if searchController.isActive {
             return nil
         }
         
-        let headerCell = tableView.dequeueReusableCellWithIdentifier("customHeaderCell") as! CustomHeaderCell
+        let headerCell = tableView.dequeueReusableCell(withIdentifier: "customHeaderCell") as! CustomHeaderCell
         headerCell.headerLabel.text = categories[section]
         return headerCell
     }
     
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        if searchController.active && searchController.searchBar.text != "" {
-            let cell = tableView.dequeueReusableCellWithIdentifier("searchResultCell", forIndexPath: indexPath) as! SearchResultCell
-            let item = searchResults[indexPath.row]
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        if searchController.isActive && searchController.searchBar.text != "" {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "searchResultCell", for: indexPath) as! SearchResultCell
+            let item = searchResults[(indexPath as NSIndexPath).row]
             let view = ItemView(frame: cell.posterView.bounds, posterURL: item.itemPoster!)
             cell.posterView.addSubview(view)
             
@@ -385,26 +385,26 @@ class ViewController: UITableViewController {
             return cell
         }
         
-        let cell = tableView.dequeueReusableCellWithIdentifier("cell", forIndexPath: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
         return cell
     }
     
     // MARK: TableView Delegate
-    override func tableView(tableView: UITableView, willDisplayCell cell: UITableViewCell, forRowAtIndexPath indexPath: NSIndexPath) {
+    override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         guard let tableViewCell = cell as? TableViewCell else { return }
-        tableViewCell.setCollectionViewDataSourceDelegate(self, forRow: indexPath.section)
+        tableViewCell.setCollectionViewDataSourceDelegate(self, forRow: (indexPath as NSIndexPath).section)
     }
     
-    override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
-        if searchController.active {
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        if searchController.isActive {
             return 144.0
         } else {
             return 175.0
         }
     }
     
-    override func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        if searchController.active {
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        if searchController.isActive {
             return 0.0
         }
         return 28.0
@@ -414,16 +414,16 @@ class ViewController: UITableViewController {
 
 // MARK: Collection View
 extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource {
-    func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         guard let mainPageItemsRows = mainPageItems else {
             return 0
         }
         return mainPageItemsRows[collectionView.tag].count
     }
 
-    func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCellWithReuseIdentifier("itemCell", forIndexPath: indexPath) as! ItemCell
-        let item = mainPageItems![(collectionView.tag)][indexPath.row]
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "itemCell", for: indexPath) as! ItemCell
+        let item = mainPageItems![(collectionView.tag)][(indexPath as NSIndexPath).row]
         //let item = mainPageItemsCollection![(collectionView.tag)].row![indexPath.row]
 
         let view = ItemView(frame: cell.bounds, posterURL: item.itemPoster!)
@@ -441,35 +441,35 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource {
 extension ViewController: UISearchBarDelegate, UISearchResultsUpdating {
     // MARK: - UISearchResultsUpdating
     
-    func updateSearchResultsForSearchController(searchController: UISearchController) {
+    func updateSearchResults(for searchController: UISearchController) {
         searchTimer?.invalidate()
-        searchTimer = NSTimer.scheduledTimerWithTimeInterval(1, target: self,
+        searchTimer = Timer.scheduledTimer(timeInterval: 1, target: self,
                                                              selector: #selector(ViewController.performSearch), userInfo: nil, repeats: false)
         
     }
     
     // MARK: - UISearchBarDelegate
     
-    func searchBarTextDidBeginEditing(searchBar: UISearchBar) {
-        footerView.hidden = true
+    func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
+        footerView.isHidden = true
         reloadTable()
     }
     
-    func searchBarCancelButtonClicked(searchBar: UISearchBar) {
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         searchResults.removeAll()
-        searchController.active = false
-        footerView.hidden = false
+        searchController.isActive = false
+        footerView.isHidden = false
         reloadTable()
     }
     
-    func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         if  searchText.characters.count == 0 {
             searchResults.removeAll()
             //reloadTable()
         }
     }
 
-    func searchBarSearchButtonClicked(searchBar: UISearchBar) {
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         performSearch()
         searchController.searchBar.resignFirstResponder()
     }

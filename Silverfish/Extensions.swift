@@ -15,26 +15,26 @@ internal var httpSiteUrl: String {
     }
 }
 
-func getFullUrl(url: String) -> String {
+func getFullUrl(_ url: String) -> String {
     var url : String = url
     if url.hasPrefix("//") {
         url = "https:" + url
     }
     
-    if (url.rangeOfString("://") == nil) {
+    if (url.range(of: "://") == nil) {
         url = httpSiteUrl + url
     }
     return url
 }
 
-func matchesForRegexInText(regex: String, text: String) -> [String] {
+func matchesForRegexInText(_ regex: String, text: String) -> [String] {
     var result = [String]()
     do {
         let regex = try NSRegularExpression(pattern: regex, options: [])
         let nsString = text as NSString
-        if let match = regex.firstMatchInString(text, options: [], range: NSMakeRange(0, nsString.length)) {
+        if let match = regex.firstMatch(in: text, options: [], range: NSMakeRange(0, nsString.length)) {
             for i in 1..<match.numberOfRanges {
-                result.append(nsString.substringWithRange(match.rangeAtIndex(i)))
+                result.append(nsString.substring(with: match.rangeAt(i)))
             }
         }
     } catch let error as NSError {
@@ -43,11 +43,11 @@ func matchesForRegexInText(regex: String, text: String) -> [String] {
     return result
 }
 
-func getBiggerThumbLink(text: String, sizeIndex: String!) -> String {
+func getBiggerThumbLink(_ text: String, sizeIndex: String!) -> String {
     let nsString = NSMutableString(string: text)
     do {
         let regex = try NSRegularExpression(pattern: "([0-9]+)/([0-9]+)/([0-9]+)/([0-9]+)/([0-9]+).jpg", options: [])
-        regex.replaceMatchesInString(nsString, options: [], range: NSMakeRange(0, nsString.length), withTemplate: "$1/$2/$3/\(sizeIndex)/$5\\.jpg")
+        regex.replaceMatches(in: nsString, options: [], range: NSMakeRange(0, nsString.length), withTemplate: "$1/$2/$3/\(sizeIndex!)/$5\\.jpg")
         
     } catch let error as NSError {
         print("invalid regex: \(error.localizedDescription)")
@@ -66,9 +66,9 @@ extension String {
     /// :returns: Returns percent-escaped string.
     
     func stringByAddingPercentEncodingForURLQueryValue() -> String? {
-        let allowedCharacters = NSCharacterSet(charactersInString: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~")
+        let allowedCharacters = CharacterSet(charactersIn: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~")
         
-        return self.stringByAddingPercentEncodingWithAllowedCharacters(allowedCharacters)
+        return self.addingPercentEncoding(withAllowedCharacters: allowedCharacters)
     }
     
 }
@@ -90,37 +90,37 @@ extension Dictionary {
             return "\(percentEscapedKey)=\(percentEscapedValue)"
         }
         
-        return parameterArray.joinWithSeparator("&")
+        return parameterArray.joined(separator: "&")
     }
     
 }
 
 extension UIImageView {
-    func downloadedFrom(link: String, contentMode mode: UIViewContentMode = .ScaleAspectFit) {
-        guard let url = NSURL(string: getFullUrl(link)) else { return }
-        contentMode = .ScaleAspectFill
+    func downloadedFrom(_ link: String, contentMode mode: UIViewContentMode = .scaleAspectFit) {
+        guard let url = URL(string: getFullUrl(link)) else { return }
+        contentMode = .scaleAspectFill
         // Request
-        let request = NSMutableURLRequest(URL: url)
-        request.cachePolicy = .ReturnCacheDataElseLoad
-        request.HTTPShouldHandleCookies = false
-        request.HTTPShouldUsePipelining = true
+        let request = NSMutableURLRequest(url: url)
+        request.cachePolicy = .returnCacheDataElseLoad
+        request.httpShouldHandleCookies = false
+        request.httpShouldUsePipelining = true
         request.addValue("image/*", forHTTPHeaderField: "Accept")
         
         //Session
-        let configuration = NSURLSessionConfiguration.defaultSessionConfiguration()
-        let session = NSURLSession(configuration: configuration)
-        UIApplication.sharedApplication().networkActivityIndicatorVisible = true
-        session.dataTaskWithRequest(request) { (data, response, error) in
+        let configuration = URLSessionConfiguration.default
+        let session = URLSession(configuration: configuration)
+        UIApplication.shared.isNetworkActivityIndicatorVisible = true
+        session.dataTask(with: request as URLRequest, completionHandler: { (data, response, error) in
             guard
-                let httpURLResponse = response as? NSHTTPURLResponse where httpURLResponse.statusCode == 200,
-                let mimeType = response?.MIMEType where mimeType.hasPrefix("image"),
-                let data = data where error == nil,
+                let httpURLResponse = response as? HTTPURLResponse , httpURLResponse.statusCode == 200,
+                let mimeType = response?.mimeType , mimeType.hasPrefix("image"),
+                let data = data , error == nil,
                 let image = UIImage(data: data)
                 else { return }
-            dispatch_sync(dispatch_get_main_queue(), { () -> Void in
-                UIApplication.sharedApplication().networkActivityIndicatorVisible = false
+            DispatchQueue.main.sync(execute: { () -> Void in
+                UIApplication.shared.isNetworkActivityIndicatorVisible = false
                 self.image = image
             })
-            }.resume()
+            }) .resume()
     }
 }

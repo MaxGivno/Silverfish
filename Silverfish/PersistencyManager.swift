@@ -9,49 +9,49 @@
 import UIKit
 
 class PersistencyManager: NSObject {
-    private var items = [Item]()
-    private var mainPageItems = [[Item]]()
+    fileprivate var items = [Item]()
+    fileprivate var mainPageItems = [[Item]]()
     
     func getItems() -> [Item] {
         return items
     }
     
-    func addItem(item: Item, index: Int) {
+    func addItem(_ item: Item, index: Int) {
         if (items.count >= index) {
-            items.insert(item, atIndex: index)
+            items.insert(item, at: index)
         } else {
             items.append(item)
         }
     }
     
-    func deleteItemAtIndex(index: Int) {
-        items.removeAtIndex(index)
+    func deleteItemAtIndex(_ index: Int) {
+        items.remove(at: index)
     }
     
     func getMainPageItems() -> [[Item]] {
         return mainPageItems
     }
     
-    func addRowToMainPage(itemsArray: [Item], atIndex: Int) {
+    func addRowToMainPage(_ itemsArray: [Item], atIndex: Int) {
         if (mainPageItems.count >= atIndex) {
-            mainPageItems.insert(itemsArray, atIndex: atIndex)
+            mainPageItems.insert(itemsArray, at: atIndex)
         } else {
             mainPageItems.append(itemsArray)
         }
         
     }
     
-    func saveImage(image: UIImage, filename: String) {
-        let path = NSHomeDirectory().stringByAppendingString("/Documents/\(filename)")
+    func saveImage(_ image: UIImage, filename: String) {
+        let path = NSHomeDirectory() + "/Documents/\(filename)"
         let data = UIImagePNGRepresentation(image)
-        data?.writeToFile(path, atomically: true)
+        try? data?.write(to: URL(fileURLWithPath: path), options: [.atomic])
     }
     
-    func getImage(filename: String) -> UIImage? {
-        let path = NSHomeDirectory().stringByAppendingString("/Documents/\(filename)")
+    func getImage(_ filename: String) -> UIImage? {
+        let path = NSHomeDirectory() + "/Documents/\(filename)"
         
         do {
-            let data = try NSData(contentsOfFile: path, options: .UncachedRead)
+            let data = try Data(contentsOf: URL(fileURLWithPath: path), options: .uncachedRead)
             return UIImage(data: data)
         } catch {
             //print(">>> \(error)")

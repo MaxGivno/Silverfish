@@ -5,7 +5,6 @@ extension String {
     func stringByAddingPercentEncodingForURLQueryValue() -> String? {
         let allowedCharacters = NSCharacterSet(charactersIn: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~")
         
-        //return self.stringByAddingPercentEncodingWithAllowedCharacters(allowedCharacters)
         return self.addingPercentEncoding(withAllowedCharacters: allowedCharacters as CharacterSet)
     }
     

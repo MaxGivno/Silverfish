@@ -19,43 +19,44 @@ class HTTPClient {
         "Accept-Encoding": "identity, *;q=0"
     ]
     
-    func htmlDecode(html : NSData) -> String {
-        let decodedString = NSString(data: html, encoding: NSUTF8StringEncoding) as! String
+    func htmlDecode(_ html : Data) -> String {
+        let decodedString = NSString(data: html, encoding: String.Encoding.utf8.rawValue) as! String
         return decodedString
     }
     
-    func HTTPsendRequest(request: NSMutableURLRequest, callback: (NSData?, String?) -> Void) {
-        let configuration = NSURLSessionConfiguration.defaultSessionConfiguration()
-        let session = NSURLSession(configuration: configuration)
-        UIApplication.sharedApplication().networkActivityIndicatorVisible = true
-        let task = session.dataTaskWithRequest(request, completionHandler :
+    func HTTPsendRequest(_ request: NSMutableURLRequest, callback: @escaping (Data?, String?) -> Void) {
+        let configuration = URLSessionConfiguration.default
+        let session = URLSession(configuration: configuration)
+        UIApplication.shared.isNetworkActivityIndicatorVisible = true
+
+        let task = session.dataTask(with: request as URLRequest, completionHandler :
             {
                 data, response, error in
                 if error != nil {
                     callback(nil, (error!.localizedDescription) as String)
                 } else {
-                    UIApplication.sharedApplication().networkActivityIndicatorVisible = false
+                    UIApplication.shared.isNetworkActivityIndicatorVisible = false
                     callback(data!, nil)
                 }
-        })
+            })
         
         task.resume()
     }
     
-    func HTTPGet(url: String, referer: String?, postParams: Dictionary<String, AnyObject>?, callback: (NSData?, String?) -> Void) {
+    func HTTPGet(_ url: String, referer: String?, postParams: Dictionary<String, AnyObject>?, callback: @escaping (Data?, String?) -> Void) {
         
-        let request = NSMutableURLRequest(URL: NSURL(string: url)!)
+        let request = NSMutableURLRequest(url: URL(string: url)!)
         
         if postParams != nil {
             print("It is POST request")
             let postParamsEncoded = postParams!.stringFromHttpParameters()
-            request.HTTPBody = postParamsEncoded.dataUsingEncoding(NSUTF8StringEncoding)
+            request.httpBody = postParamsEncoded.data(using: String.Encoding.utf8)
             headers.updateValue("application/x-www-form-urlencoded", forKey: "Content-Type")
-            request.HTTPMethod = "POST"
-        } else if headers.indexForKey("Content-Type") != nil {
+            request.httpMethod = "POST"
+        } else if headers.index(forKey: "Content-Type") != nil {
             print("It is GET request")
-            headers.removeValueForKey("Content-Type")
-            request.HTTPMethod = "GET"
+            headers.removeValue(forKey: "Content-Type")
+            request.httpMethod = "GET"
         }
         
         if referer != nil {
@@ -69,13 +70,13 @@ class HTTPClient {
         HTTPsendRequest(request, callback: callback)
     }
     
-    func getImage(url: String, callback: (NSData?, String?) -> Void) {
+    func getImage(_ url: String, callback: @escaping (Data?, String?) -> Void) {
         let fullUrl = getFullUrl(url)
-        let request = NSMutableURLRequest(URL: NSURL(string: fullUrl)!)
+        let request = NSMutableURLRequest(url: URL(string: fullUrl)!)
         
-        request.cachePolicy = .ReturnCacheDataElseLoad
-        request.HTTPShouldHandleCookies = false
-        request.HTTPShouldUsePipelining = true
+        request.cachePolicy = .returnCacheDataElseLoad
+        request.httpShouldHandleCookies = false
+        request.httpShouldUsePipelining = true
         request.addValue("image/*", forHTTPHeaderField: "Accept")
         
         HTTPsendRequest(request, callback: callback)

@@ -14,11 +14,8 @@ class Item: NSObject {
     var itemPoster: String?
     var itemLink: String?
     
-    var tag: Int?
-    
     // for details view
     var hasDetails: Bool! = false
-    var itemid: String?
     var name: String?
     var altName: String?
     var genre: String?
@@ -33,7 +30,6 @@ class Item: NSObject {
     var itemDescription: String!
     var duration: String?
     var similarItems: [Item]?
-    
     
     // for favorites
     var categoryName: String?

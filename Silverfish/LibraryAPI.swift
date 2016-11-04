@@ -18,11 +18,11 @@ class LibraryAPI: NSObject {
         return Singleton.instance
     }
     
-    private let persistencyManager: PersistencyManager
-    private let httpClient: HTTPClient
+    fileprivate let persistencyManager: PersistencyManager
+    fileprivate let httpClient: HTTPClient
     //private var mainPageItems = [String : [Item]]()
 
-    private let isOnline: Bool
+    fileprivate let isOnline: Bool
 
     override init() {
         persistencyManager = PersistencyManager()
@@ -30,22 +30,22 @@ class LibraryAPI: NSObject {
         isOnline = false
         
         super.init()
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(self.downloadImage(_:)), name: "DownloadImageNotification", object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.downloadImage(_:)), name: NSNotification.Name(rawValue: "DownloadImageNotification"), object: nil)
     }
     
     deinit {
-        NSNotificationCenter.defaultCenter().removeObserver(self)
+        NotificationCenter.default.removeObserver(self)
     }
     
     func getItems() -> [Item] {
         return persistencyManager.getItems()
     }
     
-    func addItem(item: Item, index: Int) {
+    func addItem(_ item: Item, index: Int) {
         persistencyManager.addItem(item, index: index)
     }
     
-    func deleteItem(index: Int) {
+    func deleteItem(_ index: Int) {
         persistencyManager.deleteItemAtIndex(index)
     }
     
@@ -53,7 +53,7 @@ class LibraryAPI: NSObject {
         return persistencyManager.getMainPageItems()
     }
     
-    func addRowToMainPage(itemsArray: [Item], atIndex: Int) {
+    func addRowToMainPage(_ itemsArray: [Item], atIndex: Int) {
         persistencyManager.addRowToMainPage(itemsArray, atIndex: atIndex)
     }
     
@@ -66,7 +66,7 @@ class LibraryAPI: NSObject {
         //        }
     }
     
-    func httpGET(url: String, referer: String!, postParams: Dictionary<String, AnyObject>?, callback: (NSData?, String?) -> Void) {
+    func httpGET(_ url: String, referer: String!, postParams: Dictionary<String, AnyObject>?, callback: @escaping (Data?, String?) -> Void) {
         httpClient.HTTPGet(url, referer: referer, postParams: postParams, callback: callback)
     }
     
@@ -95,19 +95,19 @@ class LibraryAPI: NSObject {
 //        }
 //    }
     
-    func downloadImage(notification: NSNotification) {
+    func downloadImage(_ notification: Notification) {
         
-        let userInfo = notification.userInfo as! [String: AnyObject]
+        let userInfo = (notification as NSNotification).userInfo as! [String: AnyObject]
         let imageView = userInfo["imageView"] as! UIImageView?
         let coverUrl = userInfo["coverUrl"] as! String
         
         if let imageViewUnWrapped = imageView {
             
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), { () -> Void in
+            DispatchQueue.global(priority: DispatchQueue.GlobalQueuePriority.default).async(execute: { () -> Void in
                 self.httpClient.getImage(coverUrl, callback: { (data, error) in
                     let downloadedImage = UIImage(data: data!)
                     
-                    dispatch_sync(dispatch_get_main_queue(), { () -> Void in
+                    DispatchQueue.main.sync(execute: { () -> Void in
                         imageViewUnWrapped.image = downloadedImage
                     })
                 })
@@ -116,12 +116,12 @@ class LibraryAPI: NSObject {
     }
     
     func downloadImage(at URL: String, success: ((UIImage) -> ())? ) {
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), { () -> Void in
+        DispatchQueue.global(priority: DispatchQueue.GlobalQueuePriority.default).async(execute: { () -> Void in
             self.httpClient.getImage(URL, callback: { (data, error) in
                 let downloadedImage = UIImage(data: data!)
                 defer {
                     if success != nil {
-                        dispatch_sync(dispatch_get_main_queue(), { () -> Void in
+                        DispatchQueue.main.sync(execute: { () -> Void in
                             success!(downloadedImage!)
                         })
                     }
@@ -155,12 +155,12 @@ class LibraryAPI: NSObject {
 //        }
 //    }
     
-    func retrieveSearchResults(searchText: String, success: (([Item]) -> ())? ) {
-        let encodedSearchQuery = searchText.stringByAddingPercentEncodingWithAllowedCharacters(NSCharacterSet.URLQueryAllowedCharacterSet())!
+    func retrieveSearchResults(_ searchText: String, success: (([Item]) -> ())? ) {
+        let encodedSearchQuery = searchText.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed)!
         let parameters = "search.aspx?search=\(encodedSearchQuery)"
         let searchUrl = httpSiteUrl + "/" + parameters
         
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) { () -> Void in
+        DispatchQueue.global(priority: DispatchQueue.GlobalQueuePriority.default).async { () -> Void in
             self.httpGET(searchUrl, referer: httpSiteUrl, postParams: nil) { (data, error) in
                 if error != nil {
                     print(">>> Error getting data: \(error)")
@@ -168,30 +168,30 @@ class LibraryAPI: NSObject {
                     var searchResuts = [Item]()
                     defer {
                         if success != nil {
-                            dispatch_sync(dispatch_get_main_queue(), { () -> Void in
+                            DispatchQueue.main.sync(execute: { () -> Void in
                                 success!(searchResuts)
                             })
                         }
                     }
                     
-                    let doc = TFHpple(HTMLData: data)
-                    let results = doc.searchWithXPathQuery("//a[@class='b-search-page__results-item  m-video']") as! [TFHppleElement]
+                    let doc = TFHpple(htmlData: data)
+                    let results = doc?.search(withXPathQuery: "//a[@class='b-search-page__results-item  m-video']") as! [TFHppleElement]
                     
                     for element in results {
                         let item = Item()
-                        item.itemLink = element.objectForKey("href")
+                        item.itemLink = element.object(forKey: "href")
                         
                         // TODO: Check item link for 404
                         // If so, do not add item to list.
                         
-                        let posterUrl = (element.searchWithXPathQuery("//img/@src").last as? TFHppleElement)?.text()
+                        let posterUrl = (element.search(withXPathQuery: "//img/@src").last as? TFHppleElement)?.text()
                         item.itemPoster = getBiggerThumbLink(posterUrl!, sizeIndex: "6")
                         
-                        item.itemTitle = (element.searchWithXPathQuery("//@title").last as? TFHppleElement)?.text()
+                        item.itemTitle = (element.search(withXPathQuery: "//@title").last as? TFHppleElement)?.text()
                         
-                        item.genre = (element.searchWithXPathQuery("//span[@class='b-search-page__results-item-genres']").first as? TFHppleElement)?.text().capitalizedString
-                        item.upVoteValue = (element.searchWithXPathQuery("//span[@class='b-search-page__results-item-rating-positive']").first as? TFHppleElement)?.text()
-                        item.downVoteValue = (element.searchWithXPathQuery("//span[@class='b-search-page__results-item-rating-negative']").first as? TFHppleElement)?.text()
+                        item.genre = (element.search(withXPathQuery: "//span[@class='b-search-page__results-item-genres']").first as? TFHppleElement)?.text().capitalized
+                        item.upVoteValue = (element.search(withXPathQuery: "//span[@class='b-search-page__results-item-rating-positive']").first as? TFHppleElement)?.text()
+                        item.downVoteValue = (element.search(withXPathQuery: "//span[@class='b-search-page__results-item-rating-negative']").first as? TFHppleElement)?.text()
                         
                         //item.itemDescription = (element.searchWithXPathQuery("//span[@class='b-search-page__results-item-description']").last as? TFHppleElement)?.text().stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
                         
@@ -203,7 +203,7 @@ class LibraryAPI: NSObject {
     }
     
     func getMainItemsRow(at URL: String, success: (([Item]) -> ())? ) {
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) { () -> Void in
+        DispatchQueue.global(priority: DispatchQueue.GlobalQueuePriority.default).async { () -> Void in
             self.httpGET(httpSiteUrl + URL, referer: httpSiteUrl, postParams: nil) { (data, error) in
                 if error != nil {
                     print(error)
@@ -212,31 +212,31 @@ class LibraryAPI: NSObject {
                     var resultsArray = [Item]()
                     defer {
                         if success != nil {
-                            dispatch_sync(dispatch_get_main_queue(), { () -> Void in
+                            DispatchQueue.main.sync(execute: { () -> Void in
                                 success!(resultsArray)
                             })
                         }
                     }
                     
-                    let doc = TFHpple(HTMLData: data)
-                    let results = doc.searchWithXPathQuery("//div[@class='b-poster-tile   ']") as! [TFHppleElement]
+                    let doc = TFHpple(htmlData: data)
+                    let results = doc?.search(withXPathQuery: "//div[@class='b-poster-tile   ']") as! [TFHppleElement]
                     
                     for element in results {
                         let item = Item()
-                        let linkNodes = element.searchWithXPathQuery("//a[@class='b-poster-tile__link']") as! [TFHppleElement]
+                        let linkNodes = element.search(withXPathQuery: "//a[@class='b-poster-tile__link']") as! [TFHppleElement]
                         for link in linkNodes {
-                            item.itemLink = link.objectForKey("href")
+                            item.itemLink = link.object(forKey: "href")
                         }
                         
-                        let imageURLNodes = element.searchWithXPathQuery("//span[@class='b-poster-tile__image']/img") as! [TFHppleElement]
+                        let imageURLNodes = element.search(withXPathQuery: "//span[@class='b-poster-tile__image']/img") as! [TFHppleElement]
                         for image in imageURLNodes {
-                            let posterLink = image.objectForKey("src")
+                            let posterLink = image.object(forKey: "src")
                             item.itemPoster = posterLink
                         }
                         
-                        let titleNodes = element.searchWithXPathQuery("//span[@class='b-poster-tile__title-short']") as! [TFHppleElement]
+                        let titleNodes = element.search(withXPathQuery: "//span[@class='b-poster-tile__title-short']") as! [TFHppleElement]
                         for title in titleNodes {
-                            item.itemTitle = title.text().stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
+                            item.itemTitle = title.text().trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
                         }
                         
                         //self.getItemDetails(item)
@@ -249,41 +249,41 @@ class LibraryAPI: NSObject {
     }
     
     func getPopularItems() {
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) { () -> Void in
+        DispatchQueue.global(priority: DispatchQueue.GlobalQueuePriority.default).async { () -> Void in
             self.httpGET(httpSiteUrl + "/video/films/?sort=trend", referer: httpSiteUrl, postParams: nil) { (data, error) in
                 if error != nil {
                     print(error)
                     return
                 } else {
-                    let doc = TFHpple(HTMLData: data)
+                    let doc = TFHpple(htmlData: data)
                     var popularMoviesArray = [Item]()
                     
-                    let popularMovies = doc.searchWithXPathQuery("//div[@class='b-poster-tile   ']") as! [TFHppleElement]
+                    let popularMovies = doc?.search(withXPathQuery: "//div[@class='b-poster-tile   ']") as! [TFHppleElement]
                     
                     for element in popularMovies {
                         let item = Item()
-                        let linkNodes = element.searchWithXPathQuery("//a[@class='b-poster-tile__link']") as! [TFHppleElement]
+                        let linkNodes = element.search(withXPathQuery: "//a[@class='b-poster-tile__link']") as! [TFHppleElement]
                         for link in linkNodes {
-                            item.itemLink = link.objectForKey("href")
+                            item.itemLink = link.object(forKey: "href")
                         }
                         
-                        let imageURLNodes = element.searchWithXPathQuery("//span[@class='b-poster-tile__image']/img") as! [TFHppleElement]
+                        let imageURLNodes = element.search(withXPathQuery: "//span[@class='b-poster-tile__image']/img") as! [TFHppleElement]
                         for image in imageURLNodes {
-                            let posterLink = image.objectForKey("src")
+                            let posterLink = image.object(forKey: "src")
                             item.itemPoster = posterLink
                         }
                         
-                        let titleNodes = element.searchWithXPathQuery("//span[@class='b-poster-tile__title-short']") as! [TFHppleElement]
+                        let titleNodes = element.search(withXPathQuery: "//span[@class='b-poster-tile__title-short']") as! [TFHppleElement]
                         for title in titleNodes {
-                            item.itemTitle = title.text().stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
+                            item.itemTitle = title.text().trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
                         }
                         
                         popularMoviesArray.append(item)
                     }
 
-                    dispatch_sync(dispatch_get_main_queue(), { () -> Void in
+                    DispatchQueue.main.sync(execute: { () -> Void in
                         self.addRowToMainPage(popularMoviesArray, atIndex: 0)
-                        NSNotificationCenter.defaultCenter().postNotificationName("reload", object: nil)
+                        NotificationCenter.default.post(name: Notification.Name(rawValue: "reload"), object: nil)
                     })
                 }
             }
@@ -291,41 +291,41 @@ class LibraryAPI: NSObject {
     }
     
     func getNewMovies() {
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) { () -> Void in
+        DispatchQueue.global(priority: DispatchQueue.GlobalQueuePriority.default).async { () -> Void in
             self.httpGET(httpSiteUrl + "/video/films/?sort=new", referer: httpSiteUrl, postParams: nil) { (data, error) in
                 if error != nil {
                     print(error)
                     return
                 } else {
-                    let doc = TFHpple(HTMLData: data)
+                    let doc = TFHpple(htmlData: data)
                     var newMoviesArray = [Item]()
                     
-                    let newMovies = doc.searchWithXPathQuery("//div[@class='b-poster-tile   ']") as! [TFHppleElement]
+                    let newMovies = doc?.search(withXPathQuery: "//div[@class='b-poster-tile   ']") as! [TFHppleElement]
                     
                     for element in newMovies {
                         let item = Item()
-                        let linkNodes = element.searchWithXPathQuery("//a[@class='b-poster-tile__link']") as! [TFHppleElement]
+                        let linkNodes = element.search(withXPathQuery: "//a[@class='b-poster-tile__link']") as! [TFHppleElement]
                         for link in linkNodes {
-                            item.itemLink = link.objectForKey("href")
+                            item.itemLink = link.object(forKey: "href")
                         }
                         
-                        let imageURLNodes = element.searchWithXPathQuery("//span[@class='b-poster-tile__image']/img") as! [TFHppleElement]
+                        let imageURLNodes = element.search(withXPathQuery: "//span[@class='b-poster-tile__image']/img") as! [TFHppleElement]
                         for image in imageURLNodes {
-                            let posterLink = image.objectForKey("src")
+                            let posterLink = image.object(forKey: "src")
                             item.itemPoster = posterLink
                         }
                         
-                        let titleNodes = element.searchWithXPathQuery("//span[@class='b-poster-tile__title-short']") as! [TFHppleElement]
+                        let titleNodes = element.search(withXPathQuery: "//span[@class='b-poster-tile__title-short']") as! [TFHppleElement]
                         for title in titleNodes {
-                            item.itemTitle = title.text().stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
+                            item.itemTitle = title.text().trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
                         }
                         
                         newMoviesArray.append(item)
                     }
 
-                    dispatch_sync(dispatch_get_main_queue(), { () -> Void in
+                    DispatchQueue.main.sync(execute: { () -> Void in
                         self.addRowToMainPage(newMoviesArray, atIndex: 1)
-                        NSNotificationCenter.defaultCenter().postNotificationName("reload", object: nil)
+                        NotificationCenter.default.post(name: Notification.Name(rawValue: "reload"), object: nil)
                     })
                 }
             }
@@ -333,41 +333,41 @@ class LibraryAPI: NSObject {
     }
     
     func getNewTVShows() {
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) { () -> Void in
+        DispatchQueue.global(priority: DispatchQueue.GlobalQueuePriority.default).async { () -> Void in
             self.httpGET(httpSiteUrl + "/video/serials/?sort=new", referer: httpSiteUrl, postParams: nil) { (data, error) in
                 if error != nil {
                     print(error)
                     return
                 } else {
-                    let doc = TFHpple(HTMLData: data)
+                    let doc = TFHpple(htmlData: data)
                     var newTVShowsArray = [Item]()
                     
-                    let newTVShows = doc.searchWithXPathQuery("//div[@class='b-poster-tile   ']") as! [TFHppleElement]
+                    let newTVShows = doc?.search(withXPathQuery: "//div[@class='b-poster-tile   ']") as! [TFHppleElement]
                     
                     for element in newTVShows {
                         let item = Item()
-                        let linkNodes = element.searchWithXPathQuery("//a[@class='b-poster-tile__link']") as! [TFHppleElement]
+                        let linkNodes = element.search(withXPathQuery: "//a[@class='b-poster-tile__link']") as! [TFHppleElement]
                         for link in linkNodes {
-                            item.itemLink = link.objectForKey("href")
+                            item.itemLink = link.object(forKey: "href")
                         }
                         
-                        let imageURLNodes = element.searchWithXPathQuery("//span[@class='b-poster-tile__image']/img") as! [TFHppleElement]
+                        let imageURLNodes = element.search(withXPathQuery: "//span[@class='b-poster-tile__image']/img") as! [TFHppleElement]
                         for image in imageURLNodes {
-                            let posterLink = image.objectForKey("src")
+                            let posterLink = image.object(forKey: "src")
                             item.itemPoster = posterLink
                         }
                         
-                        let titleNodes = element.searchWithXPathQuery("//span[@class='b-poster-tile__title-short']") as! [TFHppleElement]
+                        let titleNodes = element.search(withXPathQuery: "//span[@class='b-poster-tile__title-short']") as! [TFHppleElement]
                         for title in titleNodes {
-                            item.itemTitle = title.text().stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
+                            item.itemTitle = title.text().trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
                         }
                         
                         newTVShowsArray.append(item)
                     }
 
-                    dispatch_sync(dispatch_get_main_queue(), { () -> Void in
+                    DispatchQueue.main.sync(execute: { () -> Void in
                         self.addRowToMainPage(newTVShowsArray, atIndex: 2)
-                        NSNotificationCenter.defaultCenter().postNotificationName("reload", object: nil)
+                        NotificationCenter.default.post(name: Notification.Name(rawValue: "reload"), object: nil)
                     })
                 }
             }
@@ -375,32 +375,32 @@ class LibraryAPI: NSObject {
     }
     
     func getFavorites() {
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) { () -> Void in
+        DispatchQueue.global(priority: DispatchQueue.GlobalQueuePriority.default).async { () -> Void in
             self.httpGET(httpSiteUrl + "/myfavourites.aspx?page=inprocess", referer: httpSiteUrl, postParams: nil) { (data, error) in
                 if error != nil {
                     print(error)
                     return
                 } else {
-                    if let doc = TFHpple(HTMLData: data) {
-                        dispatch_sync(dispatch_get_main_queue(), { () -> Void in
+                    if let doc = TFHpple(htmlData: data) {
+                        DispatchQueue.main.sync(execute: { () -> Void in
                             var favoritesArray = [Item]()
                             
                             var XPathQuery = "//div[@class='b-category m-theme-video ']"
-                            guard let categoryElements = doc.searchWithXPathQuery(XPathQuery) as? [TFHppleElement] else { return }
+                            guard let categoryElements = doc.search(withXPathQuery: XPathQuery) as? [TFHppleElement] else { return }
                             for categoryElement in categoryElements {
                                 let item = Item()
                                 
                                 XPathQuery = "//span[@class='section-title']/b"
-                                item.categoryName = (categoryElement.searchWithXPathQuery(XPathQuery).last as? TFHppleElement)?.text()
+                                item.categoryName = (categoryElement.search(withXPathQuery: XPathQuery).last as? TFHppleElement)?.text()
                                 
                                 XPathQuery = "//b[@class='subject-link']/span"
-                                item.itemTitle = (categoryElement.searchWithXPathQuery(XPathQuery).last as? TFHppleElement)?.text()
+                                item.itemTitle = (categoryElement.search(withXPathQuery: XPathQuery).last as? TFHppleElement)?.text()
                                 
                                 XPathQuery = "//a[@class='b-poster-thin m-video ']/@href"
-                                item.itemLink = (categoryElement.searchWithXPathQuery(XPathQuery).last as? TFHppleElement)?.text()
+                                item.itemLink = (categoryElement.search(withXPathQuery: XPathQuery).last as? TFHppleElement)?.text()
                                 
                                 XPathQuery = "//a[@class='b-poster-thin m-video ']/@style"
-                                let wrappedString = (categoryElement.searchWithXPathQuery(XPathQuery).last as? TFHppleElement)?.text()
+                                let wrappedString = (categoryElement.search(withXPathQuery: XPathQuery).last as? TFHppleElement)?.text()
                                 
                                 item.itemPoster = (matchesForRegexInText("(?<=\')(.*)(?=\')", text: wrappedString!)).first
                                 
@@ -413,65 +413,97 @@ class LibraryAPI: NSObject {
         }
     }
     
-    func getItemDetails(item: Item) {
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) { () -> Void in
+    func getItemDetails(_ item: Item) {
+        DispatchQueue.global(priority: DispatchQueue.GlobalQueuePriority.default).async { () -> Void in
             self.httpGET(httpSiteUrl + item.itemLink!, referer: httpSiteUrl, postParams: nil) { (data, error) in
                 if error != nil {
                     print(error)
                     return
                 } else {
-                    if let doc = TFHpple(HTMLData: data) {
-                        item.name = (doc.peekAtSearchWithXPathQuery("//div[@class='b-tab-item__title-inner']/span")).text()!.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
+                    if let doc = TFHpple(htmlData: data) {
+                        item.name = (doc.peekAtSearch(withXPathQuery: "//div[@class='b-tab-item__title-inner']/span")).text()!.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
                         
-                        if let altName = doc.peekAtSearchWithXPathQuery("//div[@itemprop='alternativeHeadline']") {
-                            item.altName = altName.text().stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
+                        if let altName = doc.peekAtSearch(withXPathQuery: "//div[@itemprop='alternativeHeadline']") {
+                            item.altName = altName.text().trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
                         }
                         
-                        let itemInfo = doc.peekAtSearchWithXPathQuery("//div[@class='item-info']")
+                        let itemInfo = doc.peekAtSearch(withXPathQuery: "//div[@class='item-info']")
                         
-                        if let yearsNodes = itemInfo.searchWithXPathQuery("//tr[2]/td[2]/a/span") {
+                        if let yearsNodes = itemInfo?.search(withXPathQuery: "//tr[2]/td[2]/a/span") {
                             var years = [String]()
                             for yearNode in yearsNodes {
-                                years.append(yearNode.text())
+                                years.append((yearNode as AnyObject).text())
                             }
                             
                             if yearsNodes.count == 1 {
-                                if itemInfo.searchWithXPathQuery("//span[@class='tag show-continues']/span").first != nil {
+                                if itemInfo?.search(withXPathQuery: "//span[@class='tag show-continues']/span").first != nil {
                                     years.append("...")
                                 }
                             }
                             
-                            item.year = years.joinWithSeparator("-")
+                            item.year = years.joined(separator: "-")
                         }
                         
-                        if let genreNodes = itemInfo.searchWithXPathQuery("//span[@itemprop='genre']/a/span") {
+                        if let genreNodes = itemInfo?.search(withXPathQuery: "//span[@itemprop='genre']/a/span") {
                             var genres = [String]()
                             for node in genreNodes {
-                                genres.append(node.text())
+                                genres.append((node as AnyObject).text())
                             }
-                            item.genre = (genres.joinWithSeparator(", ")).capitalizedString
+                            item.genre = (genres.joined(separator: ", ")).capitalized
                         }
                         
-                        if let rating = itemInfo.searchWithXPathQuery("//meta[@itemprop='ratingValue']/@content").first {
-                            item.ratingValue = Float(rating.text())!/10
+                        if item.itemLink!.contains("serials") {
+                            let countryNodes = itemInfo?.search(withXPathQuery: "//tr[4]/td[2]/a/span") as! [TFHppleElement]
+                            var countries = [String]()
+                            for country in countryNodes {
+                                countries.append(country.text())
+                            }
+                            item.country = countries.joined(separator: ", ")
+                        } else {
+                            let countryNodes = itemInfo?.search(withXPathQuery: "//tr[3]/td[2]/a/span") as! [TFHppleElement]
+                            var countries = [String]()
+                            for country in countryNodes {
+                                countries.append(country.text())
+                            }
+                            item.country = countries.joined(separator: ", ")
                         }
                         
-                        if let upVoteValue = itemInfo.searchWithXPathQuery("//div[contains(@class, 'vote-value_type_yes')]").first {
-                            item.upVoteValue = upVoteValue.text()
+                        if let directorNodes = itemInfo?.search(withXPathQuery: "//span[@itemprop='director']/a/span") as? [TFHppleElement] {
+                            var directors = [String]()
+                            for director in directorNodes {
+                                directors.append(director.text())
+                            }
+                            item.director = directors.joined(separator: ", ")
                         }
                         
-                        if let downVoteValue = itemInfo.searchWithXPathQuery("//div[contains(@class, 'vote-value_type_no')]").first {
-                            item.downVoteValue = downVoteValue.text()
+                        if let actorNodes = itemInfo?.search(withXPathQuery: "//span[@itemprop='actor']/a/span") as? [TFHppleElement] {
+                            var actors = [String]()
+                            for actor in actorNodes {
+                                actors.append(actor.text())
+                            }
+                            item.actors = actors.joined(separator: ", ")
                         }
                         
-                        let thumbs = doc.searchWithXPathQuery("//a[@class='images-show']/@style")
-                        if !thumbs.isEmpty {
+                        if let rating = itemInfo?.search(withXPathQuery: "//meta[@itemprop='ratingValue']/@content").first {
+                            item.ratingValue = Float((rating as AnyObject).text())!/10
+                        }
+                        
+                        if let upVoteValue = itemInfo?.search(withXPathQuery: "//div[contains(@class, 'vote-value_type_yes')]").first {
+                            item.upVoteValue = (upVoteValue as AnyObject).text()
+                        }
+                        
+                        if let downVoteValue = itemInfo?.search(withXPathQuery: "//div[contains(@class, 'vote-value_type_no')]").first {
+                            item.downVoteValue = (downVoteValue as AnyObject).text()
+                        }
+                        
+                        let thumbs = doc.search(withXPathQuery: "//a[@class='images-show']/@style")
+                        if !(thumbs?.isEmpty)! {
                             item.thumbsUrl = []
                             for thumb in thumbs as! [TFHppleElement] {
                                 var thumbLink = thumb.text()
                                 //let thumbLink = matchesForRegexInText("(?<=\\()(.*)(?=\\))", text: attribute!).first
-                                thumbLink = thumbLink?.componentsSeparatedByString("(").last
-                                thumbLink = thumbLink?.componentsSeparatedByString(")").first
+                                thumbLink = thumbLink?.components(separatedBy: "(").last
+                                thumbLink = thumbLink?.components(separatedBy: ")").first
                                 let biggerThumbLink = getBiggerThumbLink(thumbLink!, sizeIndex: "2")
                                 item.thumbsUrl!.append(biggerThumbLink)
                             }
@@ -481,27 +513,27 @@ class LibraryAPI: NSObject {
                             item.thumbsUrl!.append(biggerThumbLink)
                         }
                         
-                        if let similarMovies = doc.searchWithXPathQuery("//div[@class='b-poster-new ']") as? [TFHppleElement] {
+                        if let similarMovies = doc.search(withXPathQuery: "//div[@class='b-poster-new ']") as? [TFHppleElement] {
                             item.similarItems = []
                             for movie in similarMovies {
                                 let similarItem = Item()
-                                similarItem.itemLink = (movie.searchWithXPathQuery("//a/@href").first)?.text()
+                                similarItem.itemLink = ((movie.search(withXPathQuery: "//a/@href").first) as AnyObject).text()
                                 
-                                similarItem.itemTitle = (movie.searchWithXPathQuery("//span[@class='m-poster-new__full_title']").first)?.text()
+                                similarItem.itemTitle = ((movie.search(withXPathQuery: "//span[@class='m-poster-new__full_title']").first) as AnyObject).text()
                                 
-                                var posterLink = (movie.searchWithXPathQuery("//span[contains(@class, 'image-poster')]/@style").first)?.text()
-                                posterLink = posterLink?.componentsSeparatedByString("('").last!
-                                posterLink = posterLink?.componentsSeparatedByString("')").first!
+                                var posterLink = ((movie.search(withXPathQuery: "//span[contains(@class, 'image-poster')]/@style").first) as AnyObject).text()
+                                posterLink = posterLink?.components(separatedBy: "('").last!
+                                posterLink = posterLink?.components(separatedBy: "')").first!
                                 similarItem.itemPoster = getBiggerThumbLink(posterLink!, sizeIndex: "6")
                                 
                                 item.similarItems!.append(similarItem)
                             }
                         }
                         
-                        if let itemDescription = doc.peekAtSearchWithXPathQuery("//div[@class='b-tab-item__description']/span/p") {
-                            item.itemDescription = itemDescription.text().stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
-                        } else if let itemDescription = doc.peekAtSearchWithXPathQuery("//div[@class='b-tab-item__description']/p") {
-                            item.itemDescription = itemDescription.text().stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
+                        if let itemDescription = doc.peekAtSearch(withXPathQuery: "//div[@class='b-tab-item__description']/span/p") {
+                            item.itemDescription = itemDescription.text().trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+                        } else if let itemDescription = doc.peekAtSearch(withXPathQuery: "//div[@class='b-tab-item__description']/p") {
+                            item.itemDescription = itemDescription.text().trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
                         }
                         
                         item.hasDetails = true
@@ -511,7 +543,7 @@ class LibraryAPI: NSObject {
         }
     }
     
-    func readDirectory(item: Item) {
+    func readDirectory(_ item: Item) {
         let folderUrl = getFullUrl(item.itemLink!)
         var isFilelist = false
         
@@ -523,29 +555,37 @@ class LibraryAPI: NSObject {
                     print(error)
                     return
                 } else {
-                    let doc = TFHpple(HTMLData: data)
+                    let doc = TFHpple(htmlData: data)
                     
                     if item.folderId == "0" {
-                        let hasBlockedContent = doc.peekAtSearchWithXPathQuery("//div[@id='file-block-text']")
+                        let hasBlockedContent = doc?.peekAtSearch(withXPathQuery: "//div[@id='file-block-text']")
                         if hasBlockedContent != nil {
                             // Show message "Blocked Content"
                         }
                     }
                     
-                    if let filelist = doc.searchWithXPathQuery("ul[@class='filelist m-current']").last as? TFHppleElement {
+                    if let filelist = doc?.search(withXPathQuery: "ul[@class='filelist m-current']").last as? TFHppleElement {
                         isFilelist = true
                         
-                        if let files = filelist.searchWithXPathQuery("//li[contains(@class, 'video-hdrip')]") as? [TFHppleElement] {
+                        if let files = filelist.search(withXPathQuery: "//li[contains(@class, 'video-hdrip')]") as? [TFHppleElement] {
                             for file in files {
                                 // get links & sizes
                             }
                             
                         }
                         
-                    } else if let folderList = doc.searchWithXPathQuery("//*[starts-with(@class,'filelist')]").last as? TFHppleElement {
+                    } else if let folderList = doc?.search(withXPathQuery: "//*[starts-with(@class,'filelist')]").last as? TFHppleElement {
                         isFilelist = false
                         // get folderId
-                        
+                        for folder in folderList.children {
+                            // Get folder 
+                            
+                            
+                            var identifier: String!
+                            identifier = ((folder as AnyObject).search(withXPathQuery: "//div[2]/a[1]").last as! TFHppleElement).attributes["name"] as! String
+                            identifier = identifier.replacingOccurrences(of: "fl", with: "")
+                            item.folderId = identifier;
+                        }
                     }
                     
                     

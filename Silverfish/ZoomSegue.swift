@@ -48,28 +48,28 @@ class ZoomSegue: UIStoryboardSegue {
 //    }
     
     override func perform() {
-        let fromView = sourceViewController.view
-        let toView = destinationViewController.view
-        if let containerView = fromView.superview {
-            let initialFrame = fromView.frame
+        let fromView = source.view
+        let toView = destination.view
+        if let containerView = fromView?.superview {
+            let initialFrame = fromView?.frame
             var offscreenRect = initialFrame
-            offscreenRect.origin.x -= CGRectGetWidth(initialFrame)
-            toView.frame = offscreenRect
-            containerView.addSubview(toView)
+            offscreenRect?.origin.x -= (initialFrame?.width)!
+            toView?.frame = offscreenRect!
+            containerView.addSubview(toView!)
             // Being explicit with the types NSTimeInterval and CGFloat are important
             // otherwise the swift compiler will complain
-            let duration: NSTimeInterval = 1.0
-            let delay: NSTimeInterval = 0.0
-            let options = UIViewAnimationOptions.CurveEaseInOut
+            let duration: TimeInterval = 1.0
+            let delay: TimeInterval = 0.0
+            let options = UIViewAnimationOptions()
             let damping: CGFloat = 0.5
             let velocity: CGFloat = 4.0
-            UIView.animateWithDuration(duration, delay: delay, usingSpringWithDamping: damping,
+            UIView.animate(withDuration: duration, delay: delay, usingSpringWithDamping: damping,
                                        initialSpringVelocity: velocity, options: options, animations: {
-                                        toView.frame = initialFrame
+                                        toView?.frame = initialFrame!
                 }, completion: { finished in
-                    toView.removeFromSuperview()
-                    if let navController = self.destinationViewController.navigationController {
-                        navController.popToViewController(self.destinationViewController, animated: false)
+                    toView?.removeFromSuperview()
+                    if let navController = self.destination.navigationController {
+                        navController.popToViewController(self.destination, animated: false)
                     }
             })
         }

@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		B62C8F7F1D153E92007C45BB /* MainPageItemsRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = B62C8F7E1D153E92007C45BB /* MainPageItemsRow.swift */; };
-		B64EA19B1CE8734C00203971 /* Catalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64EA19A1CE8734C00203971 /* Catalog.swift */; };
 		B64EA19D1CE8AF6100203971 /* DetailHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64EA19C1CE8AF6100203971 /* DetailHeaderView.swift */; };
 		B64F333C1CDDE7A1000D2659 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64F333B1CDDE7A1000D2659 /* Extensions.swift */; };
 		B64F333E1CDDEAEA000D2659 /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64F333D1CDDEAEA000D2659 /* Item.swift */; };
@@ -53,7 +52,6 @@
 
 /* Begin PBXFileReference section */
 		B62C8F7E1D153E92007C45BB /* MainPageItemsRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainPageItemsRow.swift; sourceTree = "<group>"; };
-		B64EA19A1CE8734C00203971 /* Catalog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Catalog.swift; sourceTree = "<group>"; };
 		B64EA19C1CE8AF6100203971 /* DetailHeaderView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetailHeaderView.swift; sourceTree = "<group>"; };
 		B64F333B1CDDE7A1000D2659 /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		B64F333D1CDDEAEA000D2659 /* Item.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Item.swift; sourceTree = "<group>"; };
@@ -129,7 +127,6 @@
 			isa = PBXGroup;
 			children = (
 				B64F333D1CDDEAEA000D2659 /* Item.swift */,
-				B64EA19A1CE8734C00203971 /* Catalog.swift */,
 				B62C8F7E1D153E92007C45BB /* MainPageItemsRow.swift */,
 			);
 			name = Model;
@@ -295,16 +292,18 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0730;
-				LastUpgradeCheck = 0810;
+				LastUpgradeCheck = 0800;
 				ORGANIZATIONNAME = "Givno Inc.";
 				TargetAttributes = {
 					B6F565EE1CC403BD0049D6BC = {
 						CreatedOnToolsVersion = 7.3;
+						LastSwiftMigration = 0800;
 						TestTargetID = F962F05E1CBE769200931B98;
 					};
 					F962F05E1CBE769200931B98 = {
 						CreatedOnToolsVersion = 7.3;
 						DevelopmentTeam = ZTJTKFQQMS;
+						LastSwiftMigration = 0800;
 					};
 				};
 			};
@@ -378,7 +377,6 @@
 				B6EA2E801CE315AE0072A8C8 /* TFHppleElement.m in Sources */,
 				F9DAA9B31D14316C0097321C /* CustomHeaderCell.swift in Sources */,
 				F954E7481CE61D5000DA6689 /* NavigationController.swift in Sources */,
-				B64EA19B1CE8734C00203971 /* Catalog.swift in Sources */,
 				B62C8F7F1D153E92007C45BB /* MainPageItemsRow.swift in Sources */,
 				B667F6201CDF411500BB9BC2 /* LibraryAPI.swift in Sources */,
 				F933EF991D1DB6B200624CD5 /* DetailsCell.swift in Sources */,
@@ -428,6 +426,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = dev.givnocorp.SilverfishTests;
 				PRODUCT_NAME = Silverfish;
+				SWIFT_VERSION = 3.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Silverfish.app/Silverfish";
 			};
 			name = Debug;
@@ -440,6 +439,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = dev.givnocorp.SilverfishTests;
 				PRODUCT_NAME = Silverfish;
+				SWIFT_VERSION = 3.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Silverfish.app/Silverfish";
 			};
 			name = Release;
@@ -488,7 +488,6 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 2.3;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -530,7 +529,6 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_VERSION = 2.3;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -542,13 +540,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = ZTJTKFQQMS;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Silverfish",
 				);
 				HEADER_SEARCH_PATHS = "$(SDKROOT)/usr/include/libxml2/**";
 				INFOPLIST_FILE = Silverfish/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -560,6 +559,7 @@
 				PRODUCT_NAME = Silverfish;
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/$(PROJECT_NAME)/silverfish-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = 1;
 				VALID_ARCHS = "arm64 armv7 armv7s";
 			};
@@ -571,13 +571,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = ZTJTKFQQMS;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Silverfish",
 				);
 				HEADER_SEARCH_PATHS = "$(SDKROOT)/usr/include/libxml2/**";
 				INFOPLIST_FILE = Silverfish/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -588,6 +589,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = dev.givnocorp.silverfish;
 				PRODUCT_NAME = Silverfish;
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/$(PROJECT_NAME)/silverfish-Bridging-Header.h";
+				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = 1;
 				VALID_ARCHS = "arm64 armv7 armv7s";
 			};

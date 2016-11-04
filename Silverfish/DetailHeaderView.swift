@@ -21,7 +21,7 @@ class DetailHeaderView: UIView {
         }
     }
     
-    private func updateUI() {
+    fileprivate func updateUI() {
         
     }
     

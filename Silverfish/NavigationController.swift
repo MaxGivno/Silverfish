@@ -10,7 +10,7 @@ import UIKit
 
 class NavigationController: UINavigationController {
     
-    @IBAction func unwindToViewController (sender: UIStoryboardSegue){
+    @IBAction func unwindToViewController (_ sender: UIStoryboardSegue){
         
     }
 
