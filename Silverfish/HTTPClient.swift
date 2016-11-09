@@ -48,13 +48,13 @@ class HTTPClient {
         let request = NSMutableURLRequest(url: URL(string: url)!)
         
         if postParams != nil {
-            print("It is POST request")
+            print("This is POST request")
             let postParamsEncoded = postParams!.stringFromHttpParameters()
             request.httpBody = postParamsEncoded.data(using: String.Encoding.utf8)
             headers.updateValue("application/x-www-form-urlencoded", forKey: "Content-Type")
             request.httpMethod = "POST"
         } else if headers.index(forKey: "Content-Type") != nil {
-            print("It is GET request")
+            print("This is GET request")
             headers.removeValue(forKey: "Content-Type")
             request.httpMethod = "GET"
         }
