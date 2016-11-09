@@ -14,7 +14,6 @@
 		B65F59C71CE7BBBD00811F35 /* ItemCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B65F59C61CE7BBBD00811F35 /* ItemCell.swift */; };
 		B667F6201CDF411500BB9BC2 /* LibraryAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = B667F61F1CDF411500BB9BC2 /* LibraryAPI.swift */; };
 		B667F6221CDF412100BB9BC2 /* PersistencyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B667F6211CDF412100BB9BC2 /* PersistencyManager.swift */; };
-		B67CAE011D06A2BA002A02B1 /* default.py in Resources */ = {isa = PBXBuildFile; fileRef = B67CAE001D06A2BA002A02B1 /* default.py */; };
 		B6B2CFC91CCBE20A0038AC71 /* Defaults.plist in Resources */ = {isa = PBXBuildFile; fileRef = B6B2CFC81CCBE20A0038AC71 /* Defaults.plist */; };
 		B6EA2E7F1CE315AE0072A8C8 /* TFHpple.m in Sources */ = {isa = PBXBuildFile; fileRef = B6EA2E7A1CE315AE0072A8C8 /* TFHpple.m */; };
 		B6EA2E801CE315AE0072A8C8 /* TFHppleElement.m in Sources */ = {isa = PBXBuildFile; fileRef = B6EA2E7C1CE315AE0072A8C8 /* TFHppleElement.m */; };
@@ -30,6 +29,7 @@
 		F962F0681CBE769500931B98 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F962F0661CBE769500931B98 /* Main.storyboard */; };
 		F962F06A1CBE769500931B98 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F962F0691CBE769500931B98 /* Assets.xcassets */; };
 		F962F06D1CBE769500931B98 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F962F06B1CBE769500931B98 /* LaunchScreen.storyboard */; };
+		F97737861DD3A02D00617678 /* default.py in Resources */ = {isa = PBXBuildFile; fileRef = F97737851DD3A02D00617678 /* default.py */; };
 		F9A031151CE2438900FC65E8 /* ItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9A031141CE2438900FC65E8 /* ItemView.swift */; };
 		F9A36F7A1CC94FC60043210F /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = F9A36F791CC94FC60043210F /* Settings.bundle */; };
 		F9B3EBB81D116A260046854F /* SearchResultCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B3EBB71D116A260046854F /* SearchResultCell.swift */; };
@@ -58,7 +58,6 @@
 		B65F59C61CE7BBBD00811F35 /* ItemCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ItemCell.swift; sourceTree = "<group>"; };
 		B667F61F1CDF411500BB9BC2 /* LibraryAPI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LibraryAPI.swift; sourceTree = "<group>"; };
 		B667F6211CDF412100BB9BC2 /* PersistencyManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersistencyManager.swift; sourceTree = "<group>"; };
-		B67CAE001D06A2BA002A02B1 /* default.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = default.py; sourceTree = "<group>"; };
 		B6B2CFC81CCBE20A0038AC71 /* Defaults.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Defaults.plist; sourceTree = "<group>"; };
 		B6EA2E791CE315AE0072A8C8 /* TFHpple.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TFHpple.h; path = Silverfish/TFHpple.h; sourceTree = SOURCE_ROOT; };
 		B6EA2E7A1CE315AE0072A8C8 /* TFHpple.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TFHpple.m; path = Silverfish/TFHpple.m; sourceTree = SOURCE_ROOT; };
@@ -83,6 +82,7 @@
 		F962F0691CBE769500931B98 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F962F06C1CBE769500931B98 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		F962F06E1CBE769600931B98 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F97737851DD3A02D00617678 /* default.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = default.py; sourceTree = "<group>"; };
 		F9A031141CE2438900FC65E8 /* ItemView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ItemView.swift; sourceTree = "<group>"; };
 		F9A36F791CC94FC60043210F /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
 		F9B3EBB71D116A260046854F /* SearchResultCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchResultCell.swift; sourceTree = "<group>"; };
@@ -224,7 +224,7 @@
 		F962F0611CBE769400931B98 /* Silverfish */ = {
 			isa = PBXGroup;
 			children = (
-				B67CAE001D06A2BA002A02B1 /* default.py */,
+				F97737851DD3A02D00617678 /* default.py */,
 				F9D2F6A61CE4FE09004AE211 /* Segues */,
 				B65744FD1CE3121700F7C60C /* Hpple */,
 				B64F33331CDDCE12000D2659 /* API */,
@@ -338,7 +338,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B67CAE011D06A2BA002A02B1 /* default.py in Resources */,
+				F97737861DD3A02D00617678 /* default.py in Resources */,
 				B6B2CFC91CCBE20A0038AC71 /* Defaults.plist in Resources */,
 				F962F06D1CBE769500931B98 /* LaunchScreen.storyboard in Resources */,
 				F962F06A1CBE769500931B98 /* Assets.xcassets in Resources */,

@@ -117,7 +117,7 @@ def check_login():
 def main(params):
     li = xbmcgui.ListItem('[Видео]')
     uri = strutils.construct_request({
-        'href': httpSiteUrl,
+        'href': httpSiteUrl + '/video/',
         'mode': 'get_categories',
         'category': 'video',
         'filter': '',
@@ -125,15 +125,15 @@ def main(params):
     })
     xbmcplugin.addDirectoryItem(h, uri, li, True)
 
-    # li = xbmcgui.ListItem('[Аудио]')
-    # uri = strutils.construct_request({
-    #     'href': httpSiteUrl + '/audio/',
-    #     'mode': 'get_categories',
-    #     'category': 'audio',
-    #     'filter': '',
-    #     'firstPage': 'yes'
-    # })
-    # xbmcplugin.addDirectoryItem(h, uri, li, True)
+    li = xbmcgui.ListItem('[Аудио]')
+    uri = strutils.construct_request({
+        'href': 'http://brb.to/audio/',
+        'mode': 'get_categories',
+        'category': 'audio',
+        'filter': '',
+        'firstPage': 'yes'
+    })
+    xbmcplugin.addDirectoryItem(h, uri, li, True)
 
     if check_login():
         li = xbmcgui.ListItem('В процессе')
@@ -190,13 +190,19 @@ def get_categories(params):
         return False
 
     beautifulSoup = BeautifulSoup(http)
-    # categorySubmenu = beautifulSoup.find('div', 'm-header__menu-section_type_' + section)
-    categorySubmenu = beautifulSoup.find('div', 'b-header__menu')
+
+    submenuSelector = 'b-header__menu'
+    submenuItemSelector = 'b-header__menu-section-link'
+    if params['category'] == 'audio':
+        submenuSelector = 'b-subsection-menu__items'
+        submenuItemSelector = 'b-subsection-menu__item'
+
+    categorySubmenu = beautifulSoup.find('div', submenuSelector)
     if categorySubmenu is None:
         show_message('ОШИБКА', 'Неверная страница', 3000)
         return False
 
-    subcategories = categorySubmenu.findAll('a', 'b-header__menu-section-link')
+    subcategories = categorySubmenu.findAll('a', submenuItemSelector)
     if len(subcategories) == 0:
         show_message('ОШИБКА', 'Неверная страница', 3000)
         return False
@@ -221,6 +227,7 @@ def get_categories(params):
             'section': section,
             'start': 0,
             'filter': '',
+            'disableFilters': 'yes'
         })
     else:
         xbmcplugin.endOfDirectory(h)
@@ -362,8 +369,6 @@ def read_fav_data(favoritesUrl):
         if re.search('audio', href):
             isMusic = "yes"
 
-        #get_material_details(href)
-
         favorites.append({
             'href': href,
             'title': strutils.html_entities_decode(title),
@@ -376,81 +381,18 @@ def read_fav_data(favoritesUrl):
     return favorites
 
 
-def get_material_details(url):
-    data = {}
-    cache_file_name = '%s.json' % hashlib.md5(url).hexdigest()
-    cache_file_path = os.path.join(cache_path, cache_file_name)
-
-    if xbmcvfs.exists(cache_file_path):
-        fp = open(cache_file_path, 'r')
-        data = json.load(fp)
-        fp.close()
-
-        return data
-
-    http = client.GET(url, httpSiteUrl)
-    if http is None:
-        return data
-
-    cover_regexp = re.compile("url\s*\(([^\)]+)")
-
-    beautifulSoup = BeautifulSoup(http)
-
-    info = beautifulSoup.find('div', 'item-info')
-    genre_element_container = info.findAll('span', {"itemprop" : "genre"})
-    genres = []
-    for genre_element in genre_element_container:
-        genres.append(strutils.fix_string(genre_element.find('span').string.strip()))
-
-    title = strutils.fix_string(beautifulSoup.find('div', 'b-tab-item__title-inner').find('span').string)
-    original_title = strutils.html_entities_decode(beautifulSoup.find('div', 'b-tab-item__title-origin').string)
-    description = beautifulSoup.find('p', 'item-decription').string.encode('utf-8')
-
-    poster = fs_ua.poster(client.get_full_url(beautifulSoup.find('div', 'poster-main').find('img')['src']))
-
-    images_container = beautifulSoup.find('div', 'b-tab-item__screens')
-    image_elements = images_container.findAll('a')
-    images = []
-    for image_element in image_elements:
-        images.append(
-            client.get_full_url(
-                fs_ua.poster(
-                    cover_regexp.findall(str(image_element['style']).strip())[0]
-                )
-            )
-        )
-
-    rating_positive = beautifulSoup.find('div', 'm-tab-item__vote-value_type_yes').string.strip()
-    rating_negative = beautifulSoup.find('div', 'm-tab-item__vote-value_type_no').string.strip()
-
-    data = {
-        'title': title.strip(),
-        'original_title': original_title.strip(),
-        'poster': poster,
-        'description': description,
-        'images': images,
-        'genres': genres,
-        'rating_positive': rating_positive,
-        'rating_negative': rating_negative
-    }
-
-    fp = open(cache_file_path, 'w')
-    json.dump(data, fp)
-    fp.close()
-
-    return data
-
-
 def readcategory(params):
     start = int(params['start'])
     category_href = urllib.unquote_plus(params['href'])
 
-    categoryUrl = fs_ua.get_url_with_sort_by(
-        category_href,
-        params['section'],
-        params['start'],
-        'detailed'
-    )
+    categoryUrl = category_href
+    if 'disableFilters' not in params:
+        categoryUrl = fs_ua.get_url_with_sort_by(
+            category_href,
+            params['section'],
+            params['start'],
+            'detailed'
+        )
 
     http = client.GET(categoryUrl, httpSiteUrl)
     if http is None:
@@ -689,7 +631,6 @@ def read_dir(params):
 
 
 def add_directory_item(linkItem, isFolder, playLink, playLinkClass, cover, folderUrl, folder, isMusic, quality = None, itemsCount = None):
-    folderRegexp = re.compile('(\d+)')
     lang = None
     langRegexp = re.compile('\s*m\-(\w+)\s*')
     lang_data = langRegexp.findall(linkItem['class'])
@@ -729,6 +670,7 @@ def add_directory_item(linkItem, isFolder, playLink, playLinkClass, cover, folde
 
     href = linkItem['href']
     try:
+        folderRegexp = re.compile("parent_id:\s*'([^']+)")
         folder = folderRegexp.findall(linkItem['rel'])[0]
     except:
         pass

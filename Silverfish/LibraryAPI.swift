@@ -66,7 +66,7 @@ class LibraryAPI: NSObject {
         //        }
     }
     
-    func httpGET(_ url: String, referer: String!, postParams: Dictionary<String, AnyObject>?, callback: @escaping (Data?, String?) -> Void) {
+    func httpGET(_ url: String, referer: String!, postParams: Dictionary<String, String>?, callback: @escaping (Data?, String?) -> Void) {
         httpClient.HTTPGet(url, referer: referer, postParams: postParams, callback: callback)
     }
     

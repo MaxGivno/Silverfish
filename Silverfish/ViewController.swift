@@ -59,7 +59,8 @@ class ViewController: UITableViewController {
             print("Login/Password is not set.")
             return
         } else {
-            libAPI.httpGET(httpSiteUrl + "/login.aspx", referer: httpSiteUrl, postParams: ["login": login as AnyObject, "passwd": password as AnyObject, "remember": "on" as AnyObject]){
+            let siteUrl = httpSiteUrl
+            libAPI.httpGET(siteUrl + "/login.aspx", referer: siteUrl, postParams: ["login": login, "passwd": password, "remember": "on"]){
                 (data, error) -> Void in
                 if error != nil {
                     self.title = "No Connection!"
@@ -82,7 +83,6 @@ class ViewController: UITableViewController {
             if error != nil {
                 print(error!)
             } else {
-                //let queue: dispatch_queue_t = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)
                 DispatchQueue.main.async(execute: {
                     self.checkLogin()
                     print("Removing user entries...")
@@ -98,6 +98,7 @@ class ViewController: UITableViewController {
         guard let cookies = HTTPCookieStorage.shared.cookies(for: siteUrl) else { return false }
         
         for cookie in cookies {
+            print(cookie)
             if cookie.name == "fs_us" {
                 if self.defaults.string(forKey: "userName") == nil || self.defaults.string(forKey: "userName") == "" {
                     let userCreds = cookie.value as NSString
