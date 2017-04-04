@@ -163,7 +163,7 @@ class LibraryAPI: NSObject {
         DispatchQueue.global().async { () -> Void in
             self.httpGET(searchUrl, referer: httpSiteUrl, postParams: nil) { (data, error) in
                 if error != nil {
-                    print(">>> Error getting data: \(error)")
+                    print(">>> Error getting data: \(String(describing: error))")
                 } else {
                     var searchResuts = [Item]()
                     defer {

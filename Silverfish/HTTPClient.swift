@@ -20,7 +20,7 @@ class HTTPClient {
     ]
     
     func htmlDecode(_ html : Data) -> String {
-        let decodedString = NSString(data: html, encoding: String.Encoding.utf8.rawValue) as! String
+        let decodedString = NSString(data: html, encoding: String.Encoding.utf8.rawValue)! as String
         return decodedString
     }
     

@@ -18,7 +18,7 @@
 			<key>Key</key>
 			<string>siteUrl</string>
 			<key>DefaultValue</key>
-			<string>fs.to</string>
+			<string>fs.life</string>
 			<key>IsSecure</key>
 			<false/>
 			<key>KeyboardType</key>

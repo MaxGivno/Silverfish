@@ -116,6 +116,7 @@
 			isa = PBXGroup;
 			children = (
 				F91AED0B1CCE43E000A61507 /* HTTPClient.swift */,
+				F92E9DED1E1188EC006AF685 /* New Group */,
 				B64F333B1CDDE7A1000D2659 /* Extensions.swift */,
 				B667F61F1CDF411500BB9BC2 /* LibraryAPI.swift */,
 				B667F6211CDF412100BB9BC2 /* PersistencyManager.swift */,
@@ -200,6 +201,13 @@
 				B6F565F31CC403BD0049D6BC /* Info.plist */,
 			);
 			path = SilverfishTests;
+			sourceTree = "<group>";
+		};
+		F92E9DED1E1188EC006AF685 /* New Group */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = "New Group";
 			sourceTree = "<group>";
 		};
 		F962F0561CBE769100931B98 = {
@@ -547,7 +555,7 @@
 				);
 				HEADER_SEARCH_PATHS = "$(SDKROOT)/usr/include/libxml2/**";
 				INFOPLIST_FILE = Silverfish/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -578,7 +586,7 @@
 				);
 				HEADER_SEARCH_PATHS = "$(SDKROOT)/usr/include/libxml2/**";
 				INFOPLIST_FILE = Silverfish/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",

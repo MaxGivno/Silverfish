@@ -8,17 +8,17 @@
 
 import UIKit
 
-internal var siteUrl = "fs.to"
+internal var siteUrl = "fs.life"
 internal var httpSiteUrl: String {
     get {
-        return "https://" + siteUrl
+        return "http://" + siteUrl
     }
 }
 
 func getFullUrl(_ url: String) -> String {
     var url : String = url
     if url.hasPrefix("//") {
-        url = "https:" + url
+        url = "http:" + url
     }
     
     if (url.range(of: "://") == nil) {

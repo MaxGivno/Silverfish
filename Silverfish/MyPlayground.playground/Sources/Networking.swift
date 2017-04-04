@@ -26,7 +26,7 @@ extension Dictionary {
 
 let login = "max.ryazanov"
 let password = "q3dm17"
-let siteUrl = "fs.to"
+let siteUrl = "fs.life"
 
 var headers = [
     "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 9_3_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13E238 Safari/601.1",
