@@ -34,10 +34,12 @@
 		F9A36F7A1CC94FC60043210F /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = F9A36F791CC94FC60043210F /* Settings.bundle */; };
 		F9B3EBB81D116A260046854F /* SearchResultCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B3EBB71D116A260046854F /* SearchResultCell.swift */; };
 		F9D2F6341CE49291004AE211 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9D2F6331CE49291004AE211 /* LoadingView.swift */; };
-		F9D2F6A11CE4ADA3004AE211 /* libxml2.2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = F9D2F6A01CE4ADA3004AE211 /* libxml2.2.tbd */; };
 		F9D2F6A81CE4FE56004AE211 /* ZoomSegue.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9D2F6A71CE4FE56004AE211 /* ZoomSegue.swift */; };
 		F9D2F6AA1CE50623004AE211 /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9D2F6A91CE50623004AE211 /* DetailViewController.swift */; };
 		F9DAA9B31D14316C0097321C /* CustomHeaderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9DAA9B21D14316C0097321C /* CustomHeaderCell.swift */; };
+		F9F1C36A1E93EC3A0017B492 /* libxml2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = F9F1C3691E93EC3A0017B492 /* libxml2.tbd */; };
+		F9F1C3B41E93EF4B0017B492 /* HTMLReader.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F9F1C39F1E93EEDC0017B492 /* HTMLReader.framework */; };
+		F9F1C3B51E93EF4B0017B492 /* HTMLReader.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = F9F1C39F1E93EEDC0017B492 /* HTMLReader.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -48,7 +50,105 @@
 			remoteGlobalIDString = F962F05E1CBE769200931B98;
 			remoteInfo = fsto.viewer;
 		};
+		F9F1C39E1E93EEDC0017B492 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F9F1C3901E93EEDC0017B492 /* HTMLReader.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 1C6C1F4C1A179BF600236076;
+			remoteInfo = "HTMLReader iOS";
+		};
+		F9F1C3A01E93EEDC0017B492 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F9F1C3901E93EEDC0017B492 /* HTMLReader.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 1C9C3ECA176BC53900E982C9;
+			remoteInfo = "Tests on iOS";
+		};
+		F9F1C3A21E93EEDC0017B492 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F9F1C3901E93EEDC0017B492 /* HTMLReader.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 1C88293B18369DD70051653C;
+			remoteInfo = "HTMLReader OS X";
+		};
+		F9F1C3A41E93EEDC0017B492 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F9F1C3901E93EEDC0017B492 /* HTMLReader.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 1C88295018369DD70051653C;
+			remoteInfo = "Tests on OS X";
+		};
+		F9F1C3A61E93EEDC0017B492 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F9F1C3901E93EEDC0017B492 /* HTMLReader.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 0D10776E1C1AC2DF00CF9B41;
+			remoteInfo = "HTMLReader tvOS";
+		};
+		F9F1C3A81E93EEDC0017B492 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F9F1C3901E93EEDC0017B492 /* HTMLReader.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 0D1077771C1AC2DF00CF9B41;
+			remoteInfo = "Tests on tvOS";
+		};
+		F9F1C3AA1E93EEDC0017B492 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F9F1C3901E93EEDC0017B492 /* HTMLReader.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 1C319BC31C618863000DAA63;
+			remoteInfo = "HTMLReader watchOS";
+		};
+		F9F1C3AC1E93EEDC0017B492 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F9F1C3901E93EEDC0017B492 /* HTMLReader.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 1CD5250918DC83E6003F46A3;
+			remoteInfo = Benchmarker;
+		};
+		F9F1C3AE1E93EEDC0017B492 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F9F1C3901E93EEDC0017B492 /* HTMLReader.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 1C9513C91A80971100BB2CC9;
+			remoteInfo = "Encoding Labeler";
+		};
+		F9F1C3B01E93EEDC0017B492 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F9F1C3901E93EEDC0017B492 /* HTMLReader.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 1C9A2A071836FEAE0059FE17;
+			remoteInfo = "Entity Fetcher";
+		};
+		F9F1C3B21E93EEDC0017B492 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F9F1C3901E93EEDC0017B492 /* HTMLReader.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 1C9C3EB9176BC53900E982C9;
+			remoteInfo = "HTMLReader iOS Static Library";
+		};
+		F9F1C3B61E93EF4B0017B492 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F9F1C3901E93EEDC0017B492 /* HTMLReader.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 1C6C1F4B1A179BF600236076;
+			remoteInfo = "HTMLReader iOS";
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		F9F1C3B81E93EF4B0017B492 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				F9F1C3B51E93EF4B0017B492 /* HTMLReader.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		B62C8F7E1D153E92007C45BB /* MainPageItemsRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainPageItemsRow.swift; sourceTree = "<group>"; };
@@ -91,6 +191,8 @@
 		F9D2F6A71CE4FE56004AE211 /* ZoomSegue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZoomSegue.swift; sourceTree = "<group>"; };
 		F9D2F6A91CE50623004AE211 /* DetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
 		F9DAA9B21D14316C0097321C /* CustomHeaderCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomHeaderCell.swift; sourceTree = "<group>"; };
+		F9F1C3691E93EC3A0017B492 /* libxml2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libxml2.tbd; path = usr/lib/libxml2.tbd; sourceTree = SDKROOT; };
+		F9F1C3901E93EEDC0017B492 /* HTMLReader.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = HTMLReader.xcodeproj; path = ../../HTMLReader/HTMLReader.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -105,7 +207,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F9D2F6A11CE4ADA3004AE211 /* libxml2.2.tbd in Frameworks */,
+				F9F1C3B41E93EF4B0017B492 /* HTMLReader.framework in Frameworks */,
+				F9F1C36A1E93EC3A0017B492 /* libxml2.tbd in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -116,7 +219,6 @@
 			isa = PBXGroup;
 			children = (
 				F91AED0B1CCE43E000A61507 /* HTTPClient.swift */,
-				F92E9DED1E1188EC006AF685 /* New Group */,
 				B64F333B1CDDE7A1000D2659 /* Extensions.swift */,
 				B667F61F1CDF411500BB9BC2 /* LibraryAPI.swift */,
 				B667F6211CDF412100BB9BC2 /* PersistencyManager.swift */,
@@ -203,13 +305,6 @@
 			path = SilverfishTests;
 			sourceTree = "<group>";
 		};
-		F92E9DED1E1188EC006AF685 /* New Group */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = "New Group";
-			sourceTree = "<group>";
-		};
 		F962F0561CBE769100931B98 = {
 			isa = PBXGroup;
 			children = (
@@ -217,6 +312,7 @@
 				F962F0611CBE769400931B98 /* Silverfish */,
 				B6F565F01CC403BD0049D6BC /* SilverfishTests */,
 				F962F0601CBE769300931B98 /* Products */,
+				F9F1C3681E93EC3A0017B492 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -242,6 +338,7 @@
 				F962F0621CBE769500931B98 /* AppDelegate.swift */,
 				B6A380071CE09E6100340461 /* Resources */,
 				B6A380061CE09E4800340461 /* Settings */,
+				F9F1C3381E93EA500017B492 /* Libraries */,
 				F95C330E1CCA6CB000DE9730 /* MyPlayground.playground */,
 			);
 			path = Silverfish;
@@ -253,6 +350,40 @@
 				F9D2F6A71CE4FE56004AE211 /* ZoomSegue.swift */,
 			);
 			name = Segues;
+			sourceTree = "<group>";
+		};
+		F9F1C3381E93EA500017B492 /* Libraries */ = {
+			isa = PBXGroup;
+			children = (
+				F9F1C3901E93EEDC0017B492 /* HTMLReader.xcodeproj */,
+			);
+			name = Libraries;
+			sourceTree = "<group>";
+		};
+		F9F1C3681E93EC3A0017B492 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				F9F1C3691E93EC3A0017B492 /* libxml2.tbd */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		F9F1C3911E93EEDC0017B492 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				F9F1C39F1E93EEDC0017B492 /* HTMLReader.framework */,
+				F9F1C3A11E93EEDC0017B492 /* Tests on iOS.xctest */,
+				F9F1C3A31E93EEDC0017B492 /* HTMLReader.framework */,
+				F9F1C3A51E93EEDC0017B492 /* Tests on OS X.xctest */,
+				F9F1C3A71E93EEDC0017B492 /* HTMLReader.framework */,
+				F9F1C3A91E93EEDC0017B492 /* Tests on tvOS.xctest */,
+				F9F1C3AB1E93EEDC0017B492 /* HTMLReader.framework */,
+				F9F1C3AD1E93EEDC0017B492 /* Benchmarker */,
+				F9F1C3AF1E93EEDC0017B492 /* Encoding Labeler */,
+				F9F1C3B11E93EEDC0017B492 /* Entity Fetcher */,
+				F9F1C3B31E93EEDC0017B492 /* libHTMLReader.a */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -283,10 +414,12 @@
 				F962F05B1CBE769200931B98 /* Sources */,
 				F962F05C1CBE769200931B98 /* Frameworks */,
 				F962F05D1CBE769200931B98 /* Resources */,
+				F9F1C3B81E93EF4B0017B492 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				F9F1C3B71E93EF4B0017B492 /* PBXTargetDependency */,
 			);
 			name = Silverfish;
 			productName = fsto.viewer;
@@ -326,6 +459,12 @@
 			mainGroup = F962F0561CBE769100931B98;
 			productRefGroup = F962F0601CBE769300931B98 /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = F9F1C3911E93EEDC0017B492 /* Products */;
+					ProjectRef = F9F1C3901E93EEDC0017B492 /* HTMLReader.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				F962F05E1CBE769200931B98 /* Silverfish */,
@@ -333,6 +472,86 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		F9F1C39F1E93EEDC0017B492 /* HTMLReader.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = HTMLReader.framework;
+			remoteRef = F9F1C39E1E93EEDC0017B492 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		F9F1C3A11E93EEDC0017B492 /* Tests on iOS.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = "Tests on iOS.xctest";
+			remoteRef = F9F1C3A01E93EEDC0017B492 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		F9F1C3A31E93EEDC0017B492 /* HTMLReader.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = HTMLReader.framework;
+			remoteRef = F9F1C3A21E93EEDC0017B492 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		F9F1C3A51E93EEDC0017B492 /* Tests on OS X.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = "Tests on OS X.xctest";
+			remoteRef = F9F1C3A41E93EEDC0017B492 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		F9F1C3A71E93EEDC0017B492 /* HTMLReader.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = HTMLReader.framework;
+			remoteRef = F9F1C3A61E93EEDC0017B492 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		F9F1C3A91E93EEDC0017B492 /* Tests on tvOS.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = "Tests on tvOS.xctest";
+			remoteRef = F9F1C3A81E93EEDC0017B492 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		F9F1C3AB1E93EEDC0017B492 /* HTMLReader.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = HTMLReader.framework;
+			remoteRef = F9F1C3AA1E93EEDC0017B492 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		F9F1C3AD1E93EEDC0017B492 /* Benchmarker */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = Benchmarker;
+			remoteRef = F9F1C3AC1E93EEDC0017B492 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		F9F1C3AF1E93EEDC0017B492 /* Encoding Labeler */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = "Encoding Labeler";
+			remoteRef = F9F1C3AE1E93EEDC0017B492 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		F9F1C3B11E93EEDC0017B492 /* Entity Fetcher */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = "Entity Fetcher";
+			remoteRef = F9F1C3B01E93EEDC0017B492 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		F9F1C3B31E93EEDC0017B492 /* libHTMLReader.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libHTMLReader.a;
+			remoteRef = F9F1C3B21E93EEDC0017B492 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		B6F565ED1CC403BD0049D6BC /* Resources */ = {
@@ -403,6 +622,11 @@
 			isa = PBXTargetDependency;
 			target = F962F05E1CBE769200931B98 /* Silverfish */;
 			targetProxy = B6F565F41CC403BD0049D6BC /* PBXContainerItemProxy */;
+		};
+		F9F1C3B71E93EF4B0017B492 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "HTMLReader iOS";
+			targetProxy = F9F1C3B61E93EF4B0017B492 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
