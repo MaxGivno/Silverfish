@@ -46,9 +46,8 @@ class ViewController: UITableViewController {
         defaults.synchronize()
         
         if defaults.string(forKey: "userName") != nil || defaults.string(forKey: "userName") != "" {
-            //let name = defaults.stringForKey("userName")
-            //print("User Name is: \(name)")
             self.userName = defaults.string(forKey: "userName")!
+            print("User Name is: \(defaults.string(forKey: "userName")!)")
         } else {
             print("User Name is not set")
         }
@@ -85,7 +84,7 @@ class ViewController: UITableViewController {
             } else {
                 DispatchQueue.main.async(execute: {
                     self.checkLogin()
-                    print("Removing user entries...")
+                    //print("Removing user entries...")
                     self.defaults.removeObject(forKey: "userName")
                     self.defaults.synchronize()
                 })
@@ -93,39 +92,28 @@ class ViewController: UITableViewController {
         }
     }
     
-    func checkLogin() -> Bool {
+    func checkLogin() {
         let siteUrl = URL(string: httpSiteUrl)!
-        guard let cookies = HTTPCookieStorage.shared.cookies(for: siteUrl) else { return false }
+        guard let cookies = HTTPCookieStorage.shared.cookies(for: siteUrl) else { return }
         
         for cookie in cookies {
             print(cookie)
-            if cookie.name == "fs_us" {
-                if self.defaults.string(forKey: "userName") == nil || self.defaults.string(forKey: "userName") == "" {
-                    let userCreds = cookie.value as NSString
-                    let userCredsDecoded = NSData(data: ((userCreds.removingPercentEncoding)?.data(using: String.Encoding.utf8))!) as Data
-                    do {
-                        let json = try JSONSerialization.jsonObject(with: userCredsDecoded, options: .mutableContainers) as? [String: Any]
-                        
-                        let userName = json?["l"] as! NSString
-
-                        defaults.set(userName, forKey: "userName")
-                        defaults.synchronize()
-                        
-                    } catch {
-                        print("error serializing JSON: \(error)")
-                    }
-                }
-                self.setUserName()
+            if cookie.name == "zzm_usess" {
                 self.isLogged = true
-                print("Logged In")
-                self.loginButton.setTitle(self.userName, for: UIControlState())
-                return true
+                break
+            } else {
+                self.isLogged = false
             }
         }
-        self.isLogged = false
-        print("Logged Out")
-        self.loginButton.setTitle("Log In", for: UIControlState())
-        return false
+        
+        if isLogged {
+            self.login = self.defaults.string(forKey: "login")!
+            print("Logged In")
+            self.loginButton.setTitle(self.login, for: UIControlState())
+        } else {
+            print("Logged Out")
+            self.loginButton.setTitle("Log In", for: UIControlState())
+        }
     }
     
     override func viewDidLoad() {
@@ -141,16 +129,13 @@ class ViewController: UITableViewController {
         loginButton.layer.borderColor = UIColor( red: 111/255, green: 113/255, blue:121/255, alpha: 1.0 ).cgColor
 
         let topView = UIView(frame: CGRect(x: 0, y: -480, width: 600, height: 480))
-        //topView.backgroundColor = UIColor(red: 48/255, green: 58/255, blue: 74/255, alpha: 1.0)
         topView.backgroundColor = UIColor(red: 31/255, green: 36/255, blue: 44/255, alpha: 1.0)
         tableView.addSubview(topView)
         
         definesPresentationContext = true
         tableView.tableHeaderView = searchController.searchBar
-        //tableView.tableHeaderView?.backgroundColor = UIColor(red: 48/255, green: 58/255, blue: 74/255, alpha: 1.0)
         
         libAPI.loadData()
-        //getMainPageItems()
         tableView.contentOffset = CGPoint(x: 0, y: searchController.searchBar.frame.size.height)
     }
     
@@ -218,7 +203,6 @@ class ViewController: UITableViewController {
     func reloadMainPageItems(_ notification: Notification) {
         self.mainPageItems = libAPI.getMainPageItems()
         reloadTable()
-        //LoadingView.shared.hideOverlayView()
     }
     
     func reloadTable() {
@@ -248,7 +232,7 @@ class ViewController: UITableViewController {
     // MARK: Login Button actions
     @IBAction func loginButtonPressed(_ sender: UIButton) {
         if self.isLogged {
-            showLogoutDialog(self.userName)
+            showLogoutDialog(self.login)
         } else {
             showLoginDialog("Log in to your account.")
         }
@@ -289,7 +273,7 @@ class ViewController: UITableViewController {
             loginString = loginTextField.text!
             passwordString = passTextField.text!
             
-            if self.login.isEmpty && self.password.isEmpty {
+            if self.login.isEmpty || self.password.isEmpty {
                 
                 if (loginString.isEmpty) || (passwordString.isEmpty) {
                     //TODO: displayAlert("All fields are required")
@@ -466,7 +450,6 @@ extension ViewController: UISearchBarDelegate, UISearchResultsUpdating {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         if  searchText.characters.count == 0 {
             searchResults.removeAll()
-            //reloadTable()
         }
     }
 
