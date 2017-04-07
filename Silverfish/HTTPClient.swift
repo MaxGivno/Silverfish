@@ -24,7 +24,7 @@ class HTTPClient {
         return decodedString
     }
     
-    func HTTPsendRequest(_ request: NSMutableURLRequest, callback: @escaping (Data?, String?) -> Void) {
+    func HTTPsendRequest(_ request: NSMutableURLRequest, callback: @escaping (Data?, URLResponse?, String?) -> Void) {
         let configuration = URLSessionConfiguration.default
         let session = URLSession(configuration: configuration)
         UIApplication.shared.isNetworkActivityIndicatorVisible = true
@@ -33,17 +33,17 @@ class HTTPClient {
             {
                 data, response, error in
                 if error != nil {
-                    callback(nil, (error!.localizedDescription) as String)
+                    callback(nil, nil, (error!.localizedDescription) as String)
                 } else {
                     UIApplication.shared.isNetworkActivityIndicatorVisible = false
-                    callback(data!, nil)
+                    callback(data!, response!, nil)
                 }
             })
         
         task.resume()
     }
     
-    func HTTPGet(_ url: String, referer: String?, postParams: Dictionary<String, String>?, callback: @escaping (Data?, String?) -> Void) {
+    func HTTPGet(_ url: String, referer: String?, postParams: Dictionary<String, String>?, callback: @escaping (Data?, URLResponse?, String?) -> Void) {
         
         let request = NSMutableURLRequest(url: URL(string: url)!)
         
@@ -70,7 +70,7 @@ class HTTPClient {
         HTTPsendRequest(request, callback: callback)
     }
     
-    func getImage(_ url: String, callback: @escaping (Data?, String?) -> Void) {
+    func getImage(_ url: String, callback: @escaping (Data?, URLResponse?, String?) -> Void) {
         let fullUrl = getFullUrl(url)
         let request = NSMutableURLRequest(url: URL(string: fullUrl)!)
         

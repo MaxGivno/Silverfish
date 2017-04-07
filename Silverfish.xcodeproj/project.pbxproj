@@ -15,9 +15,6 @@
 		B667F6201CDF411500BB9BC2 /* LibraryAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = B667F61F1CDF411500BB9BC2 /* LibraryAPI.swift */; };
 		B667F6221CDF412100BB9BC2 /* PersistencyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B667F6211CDF412100BB9BC2 /* PersistencyManager.swift */; };
 		B6B2CFC91CCBE20A0038AC71 /* Defaults.plist in Resources */ = {isa = PBXBuildFile; fileRef = B6B2CFC81CCBE20A0038AC71 /* Defaults.plist */; };
-		B6EA2E7F1CE315AE0072A8C8 /* TFHpple.m in Sources */ = {isa = PBXBuildFile; fileRef = B6EA2E7A1CE315AE0072A8C8 /* TFHpple.m */; };
-		B6EA2E801CE315AE0072A8C8 /* TFHppleElement.m in Sources */ = {isa = PBXBuildFile; fileRef = B6EA2E7C1CE315AE0072A8C8 /* TFHppleElement.m */; };
-		B6EA2E811CE315AE0072A8C8 /* XPathQuery.m in Sources */ = {isa = PBXBuildFile; fileRef = B6EA2E7E1CE315AE0072A8C8 /* XPathQuery.m */; };
 		B6F565F21CC403BD0049D6BC /* SilverfishTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F565F11CC403BD0049D6BC /* SilverfishTests.swift */; };
 		F912B44C1CE3765600933DBA /* TableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F912B44B1CE3765600933DBA /* TableViewCell.swift */; };
 		F91AED0C1CCE43E000A61507 /* HTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = F91AED0B1CCE43E000A61507 /* HTTPClient.swift */; };
@@ -37,7 +34,6 @@
 		F9D2F6A81CE4FE56004AE211 /* ZoomSegue.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9D2F6A71CE4FE56004AE211 /* ZoomSegue.swift */; };
 		F9D2F6AA1CE50623004AE211 /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9D2F6A91CE50623004AE211 /* DetailViewController.swift */; };
 		F9DAA9B31D14316C0097321C /* CustomHeaderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9DAA9B21D14316C0097321C /* CustomHeaderCell.swift */; };
-		F9F1C36A1E93EC3A0017B492 /* libxml2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = F9F1C3691E93EC3A0017B492 /* libxml2.tbd */; };
 		F9F1C3B41E93EF4B0017B492 /* HTMLReader.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F9F1C39F1E93EEDC0017B492 /* HTMLReader.framework */; };
 		F9F1C3B51E93EF4B0017B492 /* HTMLReader.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = F9F1C39F1E93EEDC0017B492 /* HTMLReader.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
@@ -159,13 +155,6 @@
 		B667F61F1CDF411500BB9BC2 /* LibraryAPI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LibraryAPI.swift; sourceTree = "<group>"; };
 		B667F6211CDF412100BB9BC2 /* PersistencyManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersistencyManager.swift; sourceTree = "<group>"; };
 		B6B2CFC81CCBE20A0038AC71 /* Defaults.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Defaults.plist; sourceTree = "<group>"; };
-		B6EA2E791CE315AE0072A8C8 /* TFHpple.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TFHpple.h; path = Silverfish/TFHpple.h; sourceTree = SOURCE_ROOT; };
-		B6EA2E7A1CE315AE0072A8C8 /* TFHpple.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TFHpple.m; path = Silverfish/TFHpple.m; sourceTree = SOURCE_ROOT; };
-		B6EA2E7B1CE315AE0072A8C8 /* TFHppleElement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TFHppleElement.h; path = Silverfish/TFHppleElement.h; sourceTree = SOURCE_ROOT; };
-		B6EA2E7C1CE315AE0072A8C8 /* TFHppleElement.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TFHppleElement.m; path = Silverfish/TFHppleElement.m; sourceTree = SOURCE_ROOT; };
-		B6EA2E7D1CE315AE0072A8C8 /* XPathQuery.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XPathQuery.h; path = Silverfish/XPathQuery.h; sourceTree = SOURCE_ROOT; };
-		B6EA2E7E1CE315AE0072A8C8 /* XPathQuery.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XPathQuery.m; path = Silverfish/XPathQuery.m; sourceTree = SOURCE_ROOT; };
-		B6EA2E821CE315B90072A8C8 /* silverfish-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "silverfish-Bridging-Header.h"; path = "Silverfish/silverfish-Bridging-Header.h"; sourceTree = SOURCE_ROOT; };
 		B6F565EF1CC403BD0049D6BC /* Silverfish.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Silverfish.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B6F565F11CC403BD0049D6BC /* SilverfishTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SilverfishTests.swift; sourceTree = "<group>"; };
 		B6F565F31CC403BD0049D6BC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -208,7 +197,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				F9F1C3B41E93EF4B0017B492 /* HTMLReader.framework in Frameworks */,
-				F9F1C36A1E93EC3A0017B492 /* libxml2.tbd in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -261,21 +249,6 @@
 			name = Controller;
 			sourceTree = "<group>";
 		};
-		B65744FD1CE3121700F7C60C /* Hpple */ = {
-			isa = PBXGroup;
-			children = (
-				B6EA2E791CE315AE0072A8C8 /* TFHpple.h */,
-				B6EA2E7A1CE315AE0072A8C8 /* TFHpple.m */,
-				B6EA2E7B1CE315AE0072A8C8 /* TFHppleElement.h */,
-				B6EA2E7C1CE315AE0072A8C8 /* TFHppleElement.m */,
-				B6EA2E7D1CE315AE0072A8C8 /* XPathQuery.h */,
-				B6EA2E7E1CE315AE0072A8C8 /* XPathQuery.m */,
-				B6EA2E821CE315B90072A8C8 /* silverfish-Bridging-Header.h */,
-			);
-			name = Hpple;
-			path = "/Users/mryazanov/Documents/My Stuff/Test1/Silverfish/Silverfish";
-			sourceTree = "<absolute>";
-		};
 		B6A380061CE09E4800340461 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
@@ -308,7 +281,6 @@
 		F962F0561CBE769100931B98 = {
 			isa = PBXGroup;
 			children = (
-				F9D2F6A01CE4ADA3004AE211 /* libxml2.2.tbd */,
 				F962F0611CBE769400931B98 /* Silverfish */,
 				B6F565F01CC403BD0049D6BC /* SilverfishTests */,
 				F962F0601CBE769300931B98 /* Products */,
@@ -330,7 +302,6 @@
 			children = (
 				F97737851DD3A02D00617678 /* default.py */,
 				F9D2F6A61CE4FE09004AE211 /* Segues */,
-				B65744FD1CE3121700F7C60C /* Hpple */,
 				B64F33331CDDCE12000D2659 /* API */,
 				B64F33341CDDCE26000D2659 /* Model */,
 				B64F33351CDDCE2F000D2659 /* View */,
@@ -364,6 +335,7 @@
 			isa = PBXGroup;
 			children = (
 				F9F1C3691E93EC3A0017B492 /* libxml2.tbd */,
+				F9D2F6A01CE4ADA3004AE211 /* libxml2.2.tbd */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -597,11 +569,9 @@
 				F9A031151CE2438900FC65E8 /* ItemView.swift in Sources */,
 				B64F333C1CDDE7A1000D2659 /* Extensions.swift in Sources */,
 				F91AED0C1CCE43E000A61507 /* HTTPClient.swift in Sources */,
-				B6EA2E811CE315AE0072A8C8 /* XPathQuery.m in Sources */,
 				F912B44C1CE3765600933DBA /* TableViewCell.swift in Sources */,
 				F9D2F6AA1CE50623004AE211 /* DetailViewController.swift in Sources */,
 				F9D2F6341CE49291004AE211 /* LoadingView.swift in Sources */,
-				B6EA2E801CE315AE0072A8C8 /* TFHppleElement.m in Sources */,
 				F9DAA9B31D14316C0097321C /* CustomHeaderCell.swift in Sources */,
 				F954E7481CE61D5000DA6689 /* NavigationController.swift in Sources */,
 				B62C8F7F1D153E92007C45BB /* MainPageItemsRow.swift in Sources */,
@@ -611,7 +581,6 @@
 				F94B4A9A1D146AB9001B1024 /* DescriptionCell.swift in Sources */,
 				B667F6221CDF412100BB9BC2 /* PersistencyManager.swift in Sources */,
 				F9B3EBB81D116A260046854F /* SearchResultCell.swift in Sources */,
-				B6EA2E7F1CE315AE0072A8C8 /* TFHpple.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -777,7 +746,6 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Silverfish",
 				);
-				HEADER_SEARCH_PATHS = "$(SDKROOT)/usr/include/libxml2/**";
 				INFOPLIST_FILE = Silverfish/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -786,10 +754,8 @@
 					"$(PROJECT_DIR)/Silverfish",
 				);
 				ONLY_ACTIVE_ARCH = YES;
-				OTHER_LDFLAGS = "-lxml2";
 				PRODUCT_BUNDLE_IDENTIFIER = dev.givnocorp.silverfish;
 				PRODUCT_NAME = Silverfish;
-				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/$(PROJECT_NAME)/silverfish-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -808,7 +774,6 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Silverfish",
 				);
-				HEADER_SEARCH_PATHS = "$(SDKROOT)/usr/include/libxml2/**";
 				INFOPLIST_FILE = Silverfish/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -817,10 +782,8 @@
 					"$(PROJECT_DIR)/Silverfish",
 				);
 				ONLY_ACTIVE_ARCH = NO;
-				OTHER_LDFLAGS = "-lxml2";
 				PRODUCT_BUNDLE_IDENTIFIER = dev.givnocorp.silverfish;
 				PRODUCT_NAME = Silverfish;
-				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/$(PROJECT_NAME)/silverfish-Bridging-Header.h";
 				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = 1;
 				VALID_ARCHS = "arm64 armv7 armv7s";

@@ -60,7 +60,7 @@ class ViewController: UITableViewController {
         } else {
             let siteUrl = httpSiteUrl
             libAPI.httpGET(siteUrl + "/login.aspx", referer: siteUrl, postParams: ["login": login, "passwd": password, "remember": "on"]){
-                (data, error) -> Void in
+                (data, response, error) -> Void in
                 if error != nil {
                     self.title = "No Connection!"
                     print(error!)
@@ -78,7 +78,7 @@ class ViewController: UITableViewController {
     
     func logOut() {
         libAPI.httpGET(httpSiteUrl + "/logout.aspx", referer: httpSiteUrl, postParams: nil) {
-            (data, error) -> Void in
+            (data, response, error) -> Void in
             if error != nil {
                 print(error!)
             } else {
