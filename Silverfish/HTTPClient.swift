@@ -25,11 +25,14 @@ class HTTPClient {
     }
     
     func HTTPsendRequest(_ request: NSMutableURLRequest, callback: @escaping (Data?, URLResponse?, String?) -> Void) {
-        let configuration = URLSessionConfiguration.default
-        let session = URLSession(configuration: configuration)
-        UIApplication.shared.isNetworkActivityIndicatorVisible = true
-
-        let task = session.dataTask(with: request as URLRequest, completionHandler :
+        let cacheResponse = URLCache.shared.cachedResponse(for: request as URLRequest)
+        
+        if cacheResponse == nil {
+            let configuration = URLSessionConfiguration.default
+            let session = URLSession(configuration: configuration)
+            UIApplication.shared.isNetworkActivityIndicatorVisible = true
+            
+            let task = session.dataTask(with: request as URLRequest, completionHandler :
             {
                 data, response, error in
                 if error != nil {
@@ -39,13 +42,18 @@ class HTTPClient {
                     callback(data!, response!, nil)
                 }
             })
+            
+            task.resume()
+        } else {
+            callback(cacheResponse!.data, cacheResponse?.response, nil)
+        }
         
-        task.resume()
     }
     
     func HTTPGet(_ url: String, referer: String?, postParams: Dictionary<String, String>?, callback: @escaping (Data?, URLResponse?, String?) -> Void) {
         
-        let request = NSMutableURLRequest(url: URL(string: url)!)
+        //let request = NSMutableURLRequest(url: URL(string: url)!)
+        let request = NSMutableURLRequest(url: URL(string: url)!, cachePolicy: NSURLRequest.CachePolicy.returnCacheDataElseLoad, timeoutInterval: 60)
         
         if postParams != nil {
             print("This is POST request")
@@ -72,9 +80,8 @@ class HTTPClient {
     
     func getImage(_ url: String, callback: @escaping (Data?, URLResponse?, String?) -> Void) {
         let fullUrl = getFullUrl(url)
-        let request = NSMutableURLRequest(url: URL(string: fullUrl)!)
+        let request = NSMutableURLRequest(url: URL(string: fullUrl)!, cachePolicy: NSURLRequest.CachePolicy.returnCacheDataElseLoad, timeoutInterval: 60)
         
-        request.cachePolicy = .returnCacheDataElseLoad
         request.httpShouldHandleCookies = false
         request.httpShouldUsePipelining = true
         request.addValue("image/*", forHTTPHeaderField: "Accept")
