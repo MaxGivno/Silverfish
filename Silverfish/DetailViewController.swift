@@ -44,9 +44,6 @@ class DetailViewController: UIViewController {
         contentView.translatesAutoresizingMaskIntoConstraints = false
         thumbsView.addSubview(contentView)
         
-        //self.view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("H:|-0-[scrollView]-0-|", options: [], metrics: nil, views: ["scrollView" : thumbsView]))
-        //self.view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|-0-[scrollView]-0-|", options: [], metrics: nil, views: ["scrollView" : thumbsView]))
-        
         self.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[contentView]|", options: [], metrics: nil, views: ["contentView" : contentView]))
         self.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[contentView]|", options: [], metrics: nil, views: ["contentView" : contentView]))
         
@@ -77,17 +74,17 @@ class DetailViewController: UIViewController {
         configureTableView()
         setContentForSlideshow()
         
-        if item.thumbsUrl?.count > 1 {
+        if contentView.subviews.count > 1 && contentView.subviews[1].isKind(of: ItemView.self) {
             timer = Timer.scheduledTimer(timeInterval: 3, target: self, selector: #selector(self.moveToNextPage), userInfo: nil, repeats: true)
         }
     }
     
     deinit {
         timer.invalidate()
+        contentView.removeFromSuperview()
     }
     
     func moveToNextPage() {
-        
         let pageWidth:CGFloat = self.view.frame.width
         let maxWidth:CGFloat = pageWidth * CGFloat((item.thumbsUrl?.count)!)
         let contentOffset:CGFloat = self.thumbsView.contentOffset.x
@@ -110,17 +107,14 @@ class DetailViewController: UIViewController {
         thumbsView.addSubview(contentView)
         
         if let thumbs = item.thumbsUrl {
-            
             var viewsDict = [String: UIView]()
             viewsDict["contentView"] = contentView
             viewsDict["super"] = self.view
             var horizontal_constraints = "H:|"
             
             for thumb in thumbs {
-                let thView = UIImageView()
-                thView.downloadedFrom(thumb)
-                thView.translatesAutoresizingMaskIntoConstraints = false
-                thView.contentMode = .scaleAspectFill
+                let thFrame = CGRect(x: thumbsView.frame.width * CGFloat(thumbs.index(of: thumb)!), y: 0, width: thumbsView.frame.width, height: thumbsView.frame.height)
+                let thView = ItemView(frame: thFrame, posterURL: thumb)
                 viewsDict["subview_\(thumbs.index(of: thumb)!)"] = thView
                 contentView.addSubview(thView)
                 
@@ -133,31 +127,6 @@ class DetailViewController: UIViewController {
         }
         
         thumbsView.contentSize = contentView.systemLayoutSizeFitting(UILayoutFittingCompressedSize)
-    }
-    
-    func thumbsSet() {
-        if item.thumbsUrl != nil {
-            let thumbs = item.thumbsUrl!
-            
-            for thumb in thumbs {
-                let frame = CGRect(x: self.view.frame.width * CGFloat(thumbs.index(of: thumb)!), y: 0, width: self.view.frame.width, height: thumbsView.frame.height)
-                addSlide(frame, imageUrl: thumb)
-            }
-            self.thumbsView.contentSize = CGSize(width: self.view.frame.width*CGFloat(item.thumbsUrl!.count), height: thumbsView.frame.height)
-
-        } else {
-            let frame = CGRect(x: 0, y: 0, width: self.view.frame.width, height: thumbsView.frame.height)
-            let thImage = getBiggerThumbLink(item.itemPoster!, sizeIndex: "1")
-            addSlide(frame, imageUrl: thImage)
-            thumbsView.isScrollEnabled = false
-        }
-    }
-    
-    func addSlide(_ frame: CGRect, imageUrl: String) {
-        let thView = ItemView(frame: frame, posterURL: imageUrl)
-        thView.translatesAutoresizingMaskIntoConstraints = true
-        thView.contentMode = .scaleAspectFill
-        thumbsView.addSubview(thView)
     }
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -268,9 +237,6 @@ extension DetailViewController: UICollectionViewDelegate, UICollectionViewDataSo
 
         let view = ItemView(frame: cell.bounds, posterURL: item.itemPoster!)
         cell.addSubview(view)
-        
-//        cell.posterView.image = nil
-//        cell.posterView.downloadedFrom(item.itemPoster!)
         
         if !item.hasDetails {
             LibraryAPI.sharedInstance.getItemDetails(item)

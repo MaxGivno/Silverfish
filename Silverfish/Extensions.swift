@@ -109,18 +109,26 @@ extension UIImageView {
         //Session
         let configuration = URLSessionConfiguration.default
         let session = URLSession(configuration: configuration)
+        let cacheResponse = URLCache.shared.cachedResponse(for: request as URLRequest)
         UIApplication.shared.isNetworkActivityIndicatorVisible = true
-        session.dataTask(with: request as URLRequest, completionHandler: { (data, response, error) in
-            guard
-                let httpURLResponse = response as? HTTPURLResponse , httpURLResponse.statusCode == 200,
-                let mimeType = response?.mimeType , mimeType.hasPrefix("image"),
-                let data = data , error == nil,
-                let image = UIImage(data: data)
-                else { return }
-            DispatchQueue.main.sync(execute: { () -> Void in
-                UIApplication.shared.isNetworkActivityIndicatorVisible = false
-                self.image = image
-            })
+        
+        if cacheResponse == nil {
+            session.dataTask(with: request as URLRequest, completionHandler: { (data, response, error) in
+                guard
+                    let httpURLResponse = response as? HTTPURLResponse , httpURLResponse.statusCode == 200,
+                    let mimeType = response?.mimeType , mimeType.hasPrefix("image"),
+                    let data = data , error == nil,
+                    let image = UIImage(data: data)
+                    else { return }
+                DispatchQueue.main.sync(execute: { () -> Void in
+                    UIApplication.shared.isNetworkActivityIndicatorVisible = false
+                    self.image = image
+                })
             }) .resume()
+        } else {
+            UIApplication.shared.isNetworkActivityIndicatorVisible = false
+            self.image = UIImage(data: cacheResponse!.data)
+        }
+
     }
 }
