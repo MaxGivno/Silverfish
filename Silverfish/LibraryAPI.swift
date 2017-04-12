@@ -11,24 +11,18 @@ import HTMLReader
 
 class LibraryAPI: NSObject {
     class var sharedInstance: LibraryAPI {
-        
         struct Singleton {
             static let instance = LibraryAPI()
         }
-        
         return Singleton.instance
     }
     
     fileprivate let persistencyManager: PersistencyManager
     fileprivate let httpClient: HTTPClient
-    //private var mainPageItems = [String : [Item]]()
-
-    fileprivate let isOnline: Bool
 
     override init() {
-        persistencyManager = PersistencyManager()
-        httpClient = HTTPClient()
-        isOnline = false
+        self.persistencyManager = PersistencyManager()
+        self.httpClient = HTTPClient()
         
         super.init()
         NotificationCenter.default.addObserver(self, selector: #selector(self.downloadImage(_:)), name: NSNotification.Name(rawValue: "DownloadImageNotification"), object: nil)
@@ -255,7 +249,7 @@ class LibraryAPI: NSObject {
     
     func getPopularItems() {
         DispatchQueue.global().async { () -> Void in
-            self.httpGET(httpSiteUrl + "/video/films/?sort=trend", referer: httpSiteUrl, postParams: nil) { (data, response, error) in
+            self.httpGET(httpSiteUrl + "/video/films/?sort=popularity", referer: httpSiteUrl, postParams: nil) { (data, response, error) in
                 var contentType: NSString? = nil
                 if (response!.isKind(of: HTTPURLResponse.self)) {
                     let headers: NSDictionary = (response as! HTTPURLResponse).allHeaderFields as NSDictionary

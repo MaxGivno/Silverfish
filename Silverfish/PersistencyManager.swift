@@ -54,7 +54,7 @@ class PersistencyManager: NSObject {
             let data = try Data(contentsOf: URL(fileURLWithPath: path), options: .uncachedRead)
             return UIImage(data: data)
         } catch {
-            //print(">>> \(error)")
+            print(">>> \(error.localizedDescription)")
             return nil
         }
     }

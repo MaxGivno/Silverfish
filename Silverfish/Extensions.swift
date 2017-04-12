@@ -95,6 +95,7 @@ extension Dictionary {
     
 }
 
+// unused
 extension UIImageView {
     func downloadedFrom(_ link: String, contentMode mode: UIViewContentMode = .scaleAspectFit) {
         guard let url = URL(string: getFullUrl(link)) else { return }
