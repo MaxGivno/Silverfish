@@ -560,131 +560,139 @@ class LibraryAPI: NSObject {
                         item.itemDescription = itemDescription.textContent.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
                     }
                     
+                    
+                    
                     item.hasDetails = true
                 }
             }
         }
     }
     
-//    func readDirectory(_ item: Item) {
-//        let folderUrl = getFullUrl(item.itemLink!)
-//        var isFilelist = false
-//        
-//        while isFilelist == false {
-//            let getUrl = "\(folderUrl)?ajax&folder=\(item.folderId)"
-//            
-//            httpGET(getUrl, referer: httpSiteUrl, postParams: nil) { (data, response, error) in
-//                if error != nil {
-//                    print(error!)
-//                    return
-//                } else {
-//                    let doc = TFHpple(htmlData: data)
-//                    
-//                    if item.folderId == "0" {
-//                        let hasBlockedContent = doc?.peekAtSearch(withXPathQuery: "//div[@id='file-block-text']")
-//                        if hasBlockedContent != nil {
-//                            // Show message "Blocked Content"
-//                        }
-//                    }
-//                    
-//                    if let filelist = doc?.search(withXPathQuery: "ul[@class='filelist m-current']").last as? TFHppleElement {
-//                        isFilelist = true
-//                        
-//                        if let files = filelist.search(withXPathQuery: "//li[contains(@class, 'video-hdrip')]") as? [TFHppleElement] {
-//                            for file in files {
-//                                // get links & sizes
-//                            }
-//                            
-//                        }
-//                        
-//                    } else if let folderList = doc?.search(withXPathQuery: "//*[starts-with(@class,'filelist')]").last as? TFHppleElement {
-//                        isFilelist = false
-//                        // get folderId
-//                        for folder in folderList.children {
-//                            // Get folder 
-//                            
-//                            
-//                            var identifier: String!
-//                            identifier = ((folder as AnyObject).search(withXPathQuery: "//div[2]/a[1]").last as! TFHppleElement).attributes["name"] as! String
-//                            identifier = identifier.replacingOccurrences(of: "fl", with: "")
-//                            item.folderId = identifier;
-//                        }
-//                    }
-//                    
-//                    
-//                    for folder in folderList.children {
-//                        guard let classValue = folder.attributes["class"] as? String else { continue }
-//                        if classValue.hasPrefix("folder") {
-//                            
-//                            // only root folders contains 'header' tag
-//                            let isRootFolder = folder.childrenWithClassName("header").count > 0
-//                            
-//                            // identifier
-//                            var identifier: String!
-//                            identifier = (folder.searchWithXPathQuery("//div[2]/a[1]").last as! TFHppleElement).attributes["name"] as! String
-//                            identifier = identifier.stringByReplacingOccurrencesOfString("fl", withString: "")
-//                            item.folderId = identifier;
-//
-//                            
-//                            // quality
-//                            if (isRootFolder) {
-//                                folder.videoQuality = VideoQuality.Undefined
-//                            } else {
-//                                let qualityString = (folder.searchWithXPathQuery("//div[1]").last as! TFHppleElement).attributes["class"] as! String
-//                                if ((qualityString as NSString).rangeOfString("m-hd").location != NSNotFound) {
-//                                    folder.videoQuality = VideoQuality.HD
-//                                } else if ((qualityString as NSString).rangeOfString("m-sd").location != NSNotFound) {
-//                                    folder.videoQuality = VideoQuality.SD
-//                                } else {
-//                                    folder.videoQuality = VideoQuality.Undefined
-//                                }
-//                            }
-//                            
-//                            // language
-//                            if (isRootFolder) {
-//                                folder.language = VideoLanguage.Undefined
-//                            } else {
-//                                let languageString = (folder.searchWithXPathQuery("//div[2]/a[1]").last as! TFHppleElement).attributes["class"] as! String
-//                                if ((languageString as NSString).rangeOfString("m-en").location != NSNotFound) {
-//                                    folder.language = VideoLanguage.EN
-//                                } else if ((languageString as NSString).rangeOfString("m-ru").location != NSNotFound) {
-//                                    folder.language = VideoLanguage.RU
-//                                } else if ((languageString as NSString).rangeOfString("m-ua").location != NSNotFound) {
-//                                    folder.language = VideoLanguage.UA
-//                                } else {
-//                                    folder.language = VideoLanguage.Undefined
-//                                }
-//                            }
-//                            
-//                            folder.details = (folder.childrenWithClassName("material-details").first as! TFHppleElement).text()
-//                            folder.size = (folder.childrenWithClassName("material-details").last as! TFHppleElement).text()
-//                            folder.dateString = (folder.childrenWithClassName("material-date").last as! TFHppleElement).text()
-//                            
-//                            items.append(folder)
-//                        } else if (classValue as NSString).rangeOfString("file").location != NSNotFound {
-//                            let file = File()
-//                            
-//                            file.name = (folder.searchWithXPathQuery("//span/span").last as! TFHppleElement).text()
-//                            file.size = (folder.searchWithXPathQuery("//a/span").last as! TFHppleElement).text()
-//                            
-//                            let typeString = folder.attributes["class"] as! String
-//                            if ((typeString as NSString).rangeOfString("m-file-new_type_video").location != NSNotFound) {
-//                                file.type = FileType.Video
-//                            } else if ((typeString as NSString).rangeOfString("m-file-new_type_audio").location != NSNotFound) {
-//                                file.type = FileType.Audio
-//                            } else {
-//                                file.type = FileType.Undefined
-//                            }
-//                            
-//                            let pathComponent = (folder.searchWithXPathQuery("//a").last as! TFHppleElement)["href"] as! String
-//                            let fileURL = NSURL(scheme: "http", host: "brb.to", path: pathComponent)
-//                            file.URL = fileURL
-//                            
-//                            items.append(file)
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
+    func readDirectory(_ item: Item) {
+        let folderUrl = getFullUrl(item.itemLink!)
+        var isFilelist = false
+        
+        while isFilelist == false {
+            let getUrl = "\(folderUrl)?ajax&folder=\(item.folderId)"
+            
+            httpGET(getUrl, referer: httpSiteUrl, postParams: nil) { (data, response, error) in
+                var contentType: NSString? = nil
+                if (response!.isKind(of: HTTPURLResponse.self)) {
+                    let headers: NSDictionary = (response as! HTTPURLResponse).allHeaderFields as NSDictionary
+                    contentType = headers.value(forKey: "Content-Type") as? NSString
+                }
+                if error != nil {
+                    print(error!)
+                    return
+                } else {
+                    let doc = HTMLDocument.init(data: data!, contentTypeHeader: contentType! as String)
+                    let folderList: HTMLElement?
+                    
+                    if item.folderId == "0" {
+                        //                    if let blockedContent = doc.firstNode(matchingSelector: "div[id='file-block-text']") {
+                        //                        // Show message "Blocked Content"
+                        //                    }
+                    }
+                    
+                    if let filelist = doc.firstNode(matchingSelector: "ul[class='filelist m-current']") {
+                        isFilelist = true
+                        
+                        let files = filelist.nodes(matchingSelector: "a[class*='video-hdrip']")
+                        for file in files {
+                            let newFile = File()
+                            // get links & sizes
+                            newFile.title = file.firstNode(matchingSelector: "span[class*='filename-text']")?.textContent
+                            newFile.link = file.firstNode(matchingSelector: "a[class*='download']")?.attributes["href"]
+                            newFile.info = file.firstNode(matchingSelector: "span[class*='size']")?.textContent
+                            item.fileList?.append(newFile)
+                        }
+                        
+                    } else {
+                        folderList = doc.firstNode(matchingSelector: "*[class*='filelist')]")
+                        // get folderId
+                        for folder in folderList!.childElementNodes {
+                            // Get folder
+                            var identifier: String!
+                            identifier = (folder as AnyObject).firstNode(matchingSelector: "a")?.attributes["name"]
+                            identifier = identifier.replacingOccurrences(of: "fl", with: "")
+                            item.folderId = identifier;
+                        }
+                    }
+                    
+                    
+                    //                for folder in folderList!.childElementNodes {
+                    //                    guard let classValue = folder.attributes["class"] else { continue }
+                    //                    if classValue.hasPrefix("folder") {
+                    //
+                    //                        // only root folders contains 'header' tag
+                    //                        let isRootFolder = folder.numberOfChildren > 0
+                    //
+                    //                        // identifier
+                    //                        var identifier: String!
+                    //                        identifier = (folder as AnyObject).firstNode(matchingSelector: "a")?.attributes["name"]
+                    //                        identifier = identifier.replacingOccurrences(of: "fl", with: "")
+                    //                        item.folderId = identifier;
+                    //
+                    //
+                    //                        // quality
+                    //                        if (isRootFolder) {
+                    //                            folder.videoQuality = VideoQuality.Undefined
+                    //                        } else {
+                    //                            let qualityString = (folder.searchWithXPathQuery("//div[1]").last as! TFHppleElement).attributes["class"] as! String
+                    //                            if ((qualityString as NSString).rangeOfString("m-hd").location != NSNotFound) {
+                    //                                folder.videoQuality = VideoQuality.HD
+                    //                            } else if ((qualityString as NSString).rangeOfString("m-sd").location != NSNotFound) {
+                    //                                folder.videoQuality = VideoQuality.SD
+                    //                            } else {
+                    //                                folder.videoQuality = VideoQuality.Undefined
+                    //                            }
+                    //                        }
+                    //
+                    //                        // language
+                    //                        if (isRootFolder) {
+                    //                            folder.language = VideoLanguage.Undefined
+                    //                        } else {
+                    //                            let languageString = (folder.searchWithXPathQuery("//div[2]/a[1]").last as! TFHppleElement).attributes["class"] as! String
+                    //                            if ((languageString as NSString).rangeOfString("m-en").location != NSNotFound) {
+                    //                                folder.language = VideoLanguage.EN
+                    //                            } else if ((languageString as NSString).rangeOfString("m-ru").location != NSNotFound) {
+                    //                                folder.language = VideoLanguage.RU
+                    //                            } else if ((languageString as NSString).rangeOfString("m-ua").location != NSNotFound) {
+                    //                                folder.language = VideoLanguage.UA
+                    //                            } else {
+                    //                                folder.language = VideoLanguage.Undefined
+                    //                            }
+                    //                        }
+                    //
+                    //                        folder.details = (folder.childrenWithClassName("material-details").first as! TFHppleElement).text()
+                    //                        folder.size = (folder.childrenWithClassName("material-details").last as! TFHppleElement).text()
+                    //                        folder.dateString = (folder.childrenWithClassName("material-date").last as! TFHppleElement).text()
+                    //
+                    //                        items.append(folder)
+                    //                    } else if (classValue as NSString).range(of: "file").location != NSNotFound {
+                    //                        let file = File()
+                    //
+                    //                        file.name = (folder.searchWithXPathQuery("//span/span").last as! TFHppleElement).text()
+                    //                        file.size = (folder.searchWithXPathQuery("//a/span").last as! TFHppleElement).text()
+                    //                        
+                    //                        let typeString = folder.attributes["class"] as! String
+                    //                        if ((typeString as NSString).rangeOfString("m-file-new_type_video").location != NSNotFound) {
+                    //                            file.type = FileType.Video
+                    //                        } else if ((typeString as NSString).rangeOfString("m-file-new_type_audio").location != NSNotFound) {
+                    //                            file.type = FileType.Audio
+                    //                        } else {
+                    //                            file.type = FileType.Undefined
+                    //                        }
+                    //                        
+                    //                        let pathComponent = (folder.searchWithXPathQuery("//a").last as! TFHppleElement)["href"] as! String
+                    //                        let fileURL = NSURL(scheme: "http", host: "brb.to", path: pathComponent)
+                    //                        file.URL = fileURL
+                    //                        
+                    //                        items.append(file)
+                    //                    }
+                    //                }
+                }
+            }
+        }
+    }
 }

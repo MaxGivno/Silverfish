@@ -36,6 +36,7 @@ class Item: NSObject {
     
     // files
     var folderId: String! = "0"
+    var fileList: [File]?
     
     override var description: String {
         return  "Title: \(itemTitle) " +
