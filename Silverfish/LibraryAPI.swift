@@ -427,139 +427,33 @@ class LibraryAPI: NSObject {
     
     func getItemDetails(_ item: Item) {
         DispatchQueue.global().async { () -> Void in
-            self.httpGET(httpSiteUrl + item.itemLink!, referer: httpSiteUrl, postParams: nil) { (data, response, error) in
-                var contentType: NSString? = nil
-                if (response!.isKind(of: HTTPURLResponse.self)) {
-                    let headers: NSDictionary = (response as! HTTPURLResponse).allHeaderFields as NSDictionary
-                    contentType = headers.value(forKey: "Content-Type") as? NSString
-                }
+            self.httpGET(httpSiteUrl + item.itemLink! + "?json", referer: httpSiteUrl, postParams: nil) { (data, response, error) in
                 if error != nil {
                     print(error!)
                     return
                 } else {
-                    let doc = HTMLDocument.init(data: data!, contentTypeHeader: contentType! as String)
-                    
-                    item.name = (doc.firstNode(matchingSelector: ".b-tab-item__title-inner span")?.textContent.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines))
-                    
-                    if let altName = doc.firstNode(matchingSelector: "div[itemprop='alternativeHeadline']") {
-                        item.altName = altName.textContent.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
-                    }
-                    
-                    let itemInfo = doc.firstNode(matchingSelector: "div[class='item-info']")
-                    
-                    if let yearsNodes = itemInfo?.nodes(matchingSelector: "tbody tr:nth-child(2) td:nth-child(2) a span") {
-                        var years = [String]()
-                        for yearNode in yearsNodes {
-                            years.append(yearNode.textContent)
+                    do {
+                        let json = try JSONSerialization.jsonObject(with: data!, options: .allowFragments) as? NSDictionary
+                        item.name = json?.value(forKey: "title") as? String
+                        item.altName = json?.value(forKey: "title_origin") as? String
+                        item.itemDescription = json?.value(forKey: "description") as? String
+                        
+                        item.genre = (json?.value(forKey: "genre") as? String)?.replacingOccurrences(of: ",", with: ", ")
+                        item.country = (json?.value(forKey: "made_in") as? String)?.replacingOccurrences(of: ",", with: ", ")
+                        item.director = (json?.value(forKey: "director") as? String)?.replacingOccurrences(of: ",", with: ", ")
+                        item.actors = (json?.value(forKey: "cast") as? String)?.replacingOccurrences(of: ",", with: ", ")
+                        
+                        //item.year = json?.value(forKey: "year") as? String
+                        
+                        if json?.value(forKey: "show_end") != nil {
+                            item.year = (json?.value(forKey: "show_start") as! String) + " - " + (json?.value(forKey: "show_end") as! String)
+                        } else {
+                            item.year = (json?.value(forKey: "year") as! String)
                         }
                         
-                        if yearsNodes.count == 1 {
-                            if itemInfo?.firstNode(matchingSelector: "span[class='tag show-continues'] span") != nil {
-                                years.append("...")
-                            }
-                        }
-                        
-                        item.year = years.joined(separator: "-")
+                    } catch let error {
+                        print(error.localizedDescription)
                     }
-                    
-                    if let genreNodes = itemInfo?.nodes(matchingSelector: "span[itemprop='genre'] a span") {
-                        var genres = [String]()
-                        for node in genreNodes {
-                            genres.append(node.textContent)
-                        }
-                        item.genre = (genres.joined(separator: ", ")).capitalized
-                    }
-                    
-                    var selector = String()
-                    var countries = [String]()
-                    
-                    if item.itemLink!.contains("serials") {
-                        selector = "tbody tr:nth-child(4) td:nth-child(2) a span"
-                    } else {
-                        selector = "tbody tr:nth-child(3) td:nth-child(2) a span"
-                    }
-                    let countryNodes = itemInfo?.nodes(matchingSelector: selector)
-                    
-                    for country in countryNodes! {
-                        if country.textContent.isEmpty {
-                            continue
-                        }
-                        countries.append(country.textContent.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines))
-                    }
-                    item.country = countries.joined(separator: ", ")
-                    
-                    if let directorNodes = itemInfo?.nodes(matchingSelector: "span[itemprop='director'] a span") {
-                        var directors = [String]()
-                        for director in directorNodes {
-                            directors.append(director.textContent)
-                        }
-                        item.director = directors.joined(separator: ", ")
-                    }
-                    
-                    if let actorNodes = itemInfo?.nodes(matchingSelector: "span[itemprop='actor'] a span") {
-                        var actors = [String]()
-                        for actor in actorNodes {
-                            actors.append(actor.textContent)
-                        }
-                        item.actors = actors.joined(separator: ", ")
-                    }
-                    
-                    if let rating = itemInfo?.firstNode(matchingSelector: "meta[itemprop='ratingValue']") {
-                        item.ratingValue = Float(rating.attributes["content"]!)!/10
-                    } else {
-                        item.ratingValue = 0.0
-                    }
-                    
-                    if let upVoteValue = itemInfo?.firstNode(matchingSelector: "div[class*='vote-value_type_yes')]") {
-                        item.upVoteValue = upVoteValue.textContent
-                    } else {
-                        item.upVoteValue = ""
-                    }
-                    
-                    if let downVoteValue = itemInfo?.firstNode(matchingSelector: "div[class*='vote-value_type_no')]") {
-                        item.downVoteValue = downVoteValue.textContent
-                    } else {
-                        item.downVoteValue = ""
-                    }
-                    
-                    let thumbs = doc.nodes(matchingSelector: "a[class='images-show'][style]")
-                    if !(thumbs.isEmpty) {
-                        item.thumbsUrl = []
-                        for thumb in thumbs {
-                            var thumbLink = thumb.attributes["style"]
-                            thumbLink = thumbLink?.components(separatedBy: "(").last!
-                            thumbLink = thumbLink?.components(separatedBy: ")").first!
-                            let biggerThumbLink = getBiggerThumbLink(thumbLink!, sizeIndex: "2")
-                            item.thumbsUrl!.append(biggerThumbLink)
-                        }
-                    } else {
-                        item.thumbsUrl = []
-                        let biggerThumbLink = getBiggerThumbLink(item.itemPoster!, sizeIndex: "1")
-                        item.thumbsUrl!.append(biggerThumbLink)
-                    }
-                    
-                    let similarMovies = doc.nodes(matchingSelector: "div[class='b-poster-new ']")
-                    item.similarItems = []
-                    for movie in similarMovies {
-                        let similarItem = Item()
-                        similarItem.itemLink = (movie.firstNode(matchingSelector: "a"))?.attributes["href"]
-                        
-                        similarItem.itemTitle = (movie.firstNode(matchingSelector: "span[class='m-poster-new__full_title']"))?.textContent
-                        
-                        var posterLink = (movie.firstNode(matchingSelector: "span[class*='image-poster']"))?.attributes["style"]
-                        posterLink = posterLink?.components(separatedBy: "('").last!
-                        posterLink = posterLink?.components(separatedBy: "')").first!
-                        similarItem.itemPoster = getBiggerThumbLink(posterLink!, sizeIndex: "6")
-                        
-                        item.similarItems!.append(similarItem)
-                    }
-                    
-                    if let itemDescription = doc.firstNode(matchingSelector: "div[class='b-tab-item__description'] span p") {
-                        item.itemDescription = itemDescription.textContent.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
-                    } else if let itemDescription = doc.firstNode(matchingSelector: "div[class='b-tab-item__description'] p") {
-                        item.itemDescription = itemDescription.textContent.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
-                    }
-                    
                     
                     
                     item.hasDetails = true
@@ -568,131 +462,269 @@ class LibraryAPI: NSObject {
         }
     }
     
-    func readDirectory(_ item: Item) {
-        let folderUrl = getFullUrl(item.itemLink!)
-        var isFilelist = false
-        
-        while isFilelist == false {
-            let getUrl = "\(folderUrl)?ajax&folder=\(item.folderId)"
-            
-            httpGET(getUrl, referer: httpSiteUrl, postParams: nil) { (data, response, error) in
-                var contentType: NSString? = nil
-                if (response!.isKind(of: HTTPURLResponse.self)) {
-                    let headers: NSDictionary = (response as! HTTPURLResponse).allHeaderFields as NSDictionary
-                    contentType = headers.value(forKey: "Content-Type") as? NSString
-                }
-                if error != nil {
-                    print(error!)
-                    return
-                } else {
-                    let doc = HTMLDocument.init(data: data!, contentTypeHeader: contentType! as String)
-                    let folderList: HTMLElement?
-                    
-                    if item.folderId == "0" {
-                        //                    if let blockedContent = doc.firstNode(matchingSelector: "div[id='file-block-text']") {
-                        //                        // Show message "Blocked Content"
-                        //                    }
-                    }
-                    
-                    if let filelist = doc.firstNode(matchingSelector: "ul[class='filelist m-current']") {
-                        isFilelist = true
-                        
-                        let files = filelist.nodes(matchingSelector: "a[class*='video-hdrip']")
-                        for file in files {
-                            let newFile = File()
-                            // get links & sizes
-                            newFile.title = file.firstNode(matchingSelector: "span[class*='filename-text']")?.textContent
-                            newFile.link = file.firstNode(matchingSelector: "a[class*='download']")?.attributes["href"]
-                            newFile.info = file.firstNode(matchingSelector: "span[class*='size']")?.textContent
-                            item.fileList?.append(newFile)
-                        }
-                        
-                    } else {
-                        folderList = doc.firstNode(matchingSelector: "*[class*='filelist')]")
-                        // get folderId
-                        for folder in folderList!.childElementNodes {
-                            // Get folder
-                            var identifier: String!
-                            identifier = (folder as AnyObject).firstNode(matchingSelector: "a")?.attributes["name"]
-                            identifier = identifier.replacingOccurrences(of: "fl", with: "")
-                            item.folderId = identifier;
-                        }
-                    }
-                    
-                    
-                    //                for folder in folderList!.childElementNodes {
-                    //                    guard let classValue = folder.attributes["class"] else { continue }
-                    //                    if classValue.hasPrefix("folder") {
-                    //
-                    //                        // only root folders contains 'header' tag
-                    //                        let isRootFolder = folder.numberOfChildren > 0
-                    //
-                    //                        // identifier
-                    //                        var identifier: String!
-                    //                        identifier = (folder as AnyObject).firstNode(matchingSelector: "a")?.attributes["name"]
-                    //                        identifier = identifier.replacingOccurrences(of: "fl", with: "")
-                    //                        item.folderId = identifier;
-                    //
-                    //
-                    //                        // quality
-                    //                        if (isRootFolder) {
-                    //                            folder.videoQuality = VideoQuality.Undefined
-                    //                        } else {
-                    //                            let qualityString = (folder.searchWithXPathQuery("//div[1]").last as! TFHppleElement).attributes["class"] as! String
-                    //                            if ((qualityString as NSString).rangeOfString("m-hd").location != NSNotFound) {
-                    //                                folder.videoQuality = VideoQuality.HD
-                    //                            } else if ((qualityString as NSString).rangeOfString("m-sd").location != NSNotFound) {
-                    //                                folder.videoQuality = VideoQuality.SD
-                    //                            } else {
-                    //                                folder.videoQuality = VideoQuality.Undefined
-                    //                            }
-                    //                        }
-                    //
-                    //                        // language
-                    //                        if (isRootFolder) {
-                    //                            folder.language = VideoLanguage.Undefined
-                    //                        } else {
-                    //                            let languageString = (folder.searchWithXPathQuery("//div[2]/a[1]").last as! TFHppleElement).attributes["class"] as! String
-                    //                            if ((languageString as NSString).rangeOfString("m-en").location != NSNotFound) {
-                    //                                folder.language = VideoLanguage.EN
-                    //                            } else if ((languageString as NSString).rangeOfString("m-ru").location != NSNotFound) {
-                    //                                folder.language = VideoLanguage.RU
-                    //                            } else if ((languageString as NSString).rangeOfString("m-ua").location != NSNotFound) {
-                    //                                folder.language = VideoLanguage.UA
-                    //                            } else {
-                    //                                folder.language = VideoLanguage.Undefined
-                    //                            }
-                    //                        }
-                    //
-                    //                        folder.details = (folder.childrenWithClassName("material-details").first as! TFHppleElement).text()
-                    //                        folder.size = (folder.childrenWithClassName("material-details").last as! TFHppleElement).text()
-                    //                        folder.dateString = (folder.childrenWithClassName("material-date").last as! TFHppleElement).text()
-                    //
-                    //                        items.append(folder)
-                    //                    } else if (classValue as NSString).range(of: "file").location != NSNotFound {
-                    //                        let file = File()
-                    //
-                    //                        file.name = (folder.searchWithXPathQuery("//span/span").last as! TFHppleElement).text()
-                    //                        file.size = (folder.searchWithXPathQuery("//a/span").last as! TFHppleElement).text()
-                    //                        
-                    //                        let typeString = folder.attributes["class"] as! String
-                    //                        if ((typeString as NSString).rangeOfString("m-file-new_type_video").location != NSNotFound) {
-                    //                            file.type = FileType.Video
-                    //                        } else if ((typeString as NSString).rangeOfString("m-file-new_type_audio").location != NSNotFound) {
-                    //                            file.type = FileType.Audio
-                    //                        } else {
-                    //                            file.type = FileType.Undefined
-                    //                        }
-                    //                        
-                    //                        let pathComponent = (folder.searchWithXPathQuery("//a").last as! TFHppleElement)["href"] as! String
-                    //                        let fileURL = NSURL(scheme: "http", host: "brb.to", path: pathComponent)
-                    //                        file.URL = fileURL
-                    //                        
-                    //                        items.append(file)
-                    //                    }
-                    //                }
-                }
-            }
-        }
-    }
+//    func getItemDetails(_ item: Item) {
+//        DispatchQueue.global().async { () -> Void in
+//            self.httpGET(httpSiteUrl + item.itemLink!, referer: httpSiteUrl, postParams: nil) { (data, response, error) in
+//                var contentType: NSString? = nil
+//                if (response!.isKind(of: HTTPURLResponse.self)) {
+//                    let headers: NSDictionary = (response as! HTTPURLResponse).allHeaderFields as NSDictionary
+//                    contentType = headers.value(forKey: "Content-Type") as? NSString
+//                }
+//                if error != nil {
+//                    print(error!)
+//                    return
+//                } else {
+//                    let doc = HTMLDocument.init(data: data!, contentTypeHeader: contentType! as String)
+//
+//                    item.name = (doc.firstNode(matchingSelector: ".b-tab-item__title-inner span")?.textContent.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines))
+//
+//                    if let altName = doc.firstNode(matchingSelector: "div[itemprop='alternativeHeadline']") {
+//                        item.altName = altName.textContent.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+//                    }
+//
+//                    let itemInfo = doc.firstNode(matchingSelector: "div[class='item-info']")
+//
+//                    if let yearsNodes = itemInfo?.nodes(matchingSelector: "tbody tr:nth-child(2) td:nth-child(2) a span") {
+//                        var years = [String]()
+//                        for yearNode in yearsNodes {
+//                            years.append(yearNode.textContent)
+//                        }
+//
+//                        if yearsNodes.count == 1 {
+//                            if itemInfo?.firstNode(matchingSelector: "span[class='tag show-continues'] span") != nil {
+//                                years.append("...")
+//                            }
+//                        }
+//
+//                        item.year = years.joined(separator: "-")
+//                    }
+//
+//                    if let genreNodes = itemInfo?.nodes(matchingSelector: "span[itemprop='genre'] a span") {
+//                        var genres = [String]()
+//                        for node in genreNodes {
+//                            genres.append(node.textContent)
+//                        }
+//                        item.genre = (genres.joined(separator: ", ")).capitalized
+//                    }
+//
+//                    var selector = String()
+//                    var countries = [String]()
+//
+//                    if item.itemLink!.contains("serials") {
+//                        selector = "tbody tr:nth-child(4) td:nth-child(2) a span"
+//                    } else {
+//                        selector = "tbody tr:nth-child(3) td:nth-child(2) a span"
+//                    }
+//                    let countryNodes = itemInfo?.nodes(matchingSelector: selector)
+//
+//                    for country in countryNodes! {
+//                        if country.textContent.isEmpty {
+//                            continue
+//                        }
+//                        countries.append(country.textContent.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines))
+//                    }
+//                    item.country = countries.joined(separator: ", ")
+//
+//                    if let directorNodes = itemInfo?.nodes(matchingSelector: "span[itemprop='director'] a span") {
+//                        var directors = [String]()
+//                        for director in directorNodes {
+//                            directors.append(director.textContent)
+//                        }
+//                        item.director = directors.joined(separator: ", ")
+//                    }
+//
+//                    if let actorNodes = itemInfo?.nodes(matchingSelector: "span[itemprop='actor'] a span") {
+//                        var actors = [String]()
+//                        for actor in actorNodes {
+//                            actors.append(actor.textContent)
+//                        }
+//                        item.actors = actors.joined(separator: ", ")
+//                    }
+//
+//                    if let rating = itemInfo?.firstNode(matchingSelector: "meta[itemprop='ratingValue']") {
+//                        item.ratingValue = Float(rating.attributes["content"]!)!/10
+//                    } else {
+//                        item.ratingValue = 0.0
+//                    }
+//
+//                    if let upVoteValue = itemInfo?.firstNode(matchingSelector: "div[class*='vote-value_type_yes')]") {
+//                        item.upVoteValue = upVoteValue.textContent
+//                    } else {
+//                        item.upVoteValue = ""
+//                    }
+//
+//                    if let downVoteValue = itemInfo?.firstNode(matchingSelector: "div[class*='vote-value_type_no')]") {
+//                        item.downVoteValue = downVoteValue.textContent
+//                    } else {
+//                        item.downVoteValue = ""
+//                    }
+//
+//                    let thumbs = doc.nodes(matchingSelector: "a[class='images-show'][style]")
+//                    if !(thumbs.isEmpty) {
+//                        item.thumbsUrl = []
+//                        for thumb in thumbs {
+//                            var thumbLink = thumb.attributes["style"]
+//                            thumbLink = thumbLink?.components(separatedBy: "(").last!
+//                            thumbLink = thumbLink?.components(separatedBy: ")").first!
+//                            let biggerThumbLink = getBiggerThumbLink(thumbLink!, sizeIndex: "2")
+//                            item.thumbsUrl!.append(biggerThumbLink)
+//                        }
+//                    } else {
+//                        item.thumbsUrl = []
+//                        let biggerThumbLink = getBiggerThumbLink(item.itemPoster!, sizeIndex: "1")
+//                        item.thumbsUrl!.append(biggerThumbLink)
+//                    }
+//
+//                    let similarMovies = doc.nodes(matchingSelector: "div[class='b-poster-new ']")
+//                    item.similarItems = []
+//                    for movie in similarMovies {
+//                        let similarItem = Item()
+//                        similarItem.itemLink = (movie.firstNode(matchingSelector: "a"))?.attributes["href"]
+//
+//                        similarItem.itemTitle = (movie.firstNode(matchingSelector: "span[class='m-poster-new__full_title']"))?.textContent
+//
+//                        var posterLink = (movie.firstNode(matchingSelector: "span[class*='image-poster']"))?.attributes["style"]
+//                        posterLink = posterLink?.components(separatedBy: "('").last!
+//                        posterLink = posterLink?.components(separatedBy: "')").first!
+//                        similarItem.itemPoster = getBiggerThumbLink(posterLink!, sizeIndex: "6")
+//
+//                        item.similarItems!.append(similarItem)
+//                    }
+//
+//                    if let itemDescription = doc.firstNode(matchingSelector: "div[class='b-tab-item__description'] span p") {
+//                        item.itemDescription = itemDescription.textContent.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+//                    } else if let itemDescription = doc.firstNode(matchingSelector: "div[class='b-tab-item__description'] p") {
+//                        item.itemDescription = itemDescription.textContent.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+//                    }
+//                    
+//                    
+//                    
+//                    item.hasDetails = true
+//                }
+//            }
+//        }
+//    }
+    
+//    func readDirectory(_ item: Item) {
+//        let folderUrl = getFullUrl(item.itemLink!)
+//        
+//        let getUrl = "\(folderUrl)?ajax&folder=\(item.folderId)"
+//        
+//        httpGET(getUrl, referer: httpSiteUrl, postParams: nil) { (data, response, error) in
+//            var contentType: NSString? = nil
+//            if (response!.isKind(of: HTTPURLResponse.self)) {
+//                let headers: NSDictionary = (response as! HTTPURLResponse).allHeaderFields as NSDictionary
+//                contentType = headers.value(forKey: "Content-Type") as? NSString
+//            }
+//            if error != nil {
+//                print(error!)
+//                return
+//            } else {
+//                let doc = HTMLDocument.init(data: data!, contentTypeHeader: contentType! as String)
+//                let folderList: HTMLElement?
+//                
+//                if item.folderId == "0" {
+//                    //                    if let blockedContent = doc.firstNode(matchingSelector: "div[id='file-block-text']") {
+//                    //                        // Show message "Blocked Content"
+//                    //                    }
+//                }
+//                
+//                if let filelist = doc.firstNode(matchingSelector: "ul[class='filelist m-current']") {                    
+//                    let files = filelist.nodes(matchingSelector: "a[class*='video-hdrip']")
+//                    for file in files {
+//                        let newFile = File()
+//                        // get links & sizes
+//                        newFile.title = file.firstNode(matchingSelector: "span[class*='filename-text']")?.textContent
+//                        newFile.link = file.firstNode(matchingSelector: "a[class*='download']")?.attributes["href"]
+//                        newFile.info = file.firstNode(matchingSelector: "span[class*='size']")?.textContent
+//                        item.fileList?.append(newFile)
+//                    }
+//                    
+//                } else {
+//                    folderList = doc.firstNode(matchingSelector: "*[class*='filelist')]")
+//                    // get folderId
+//                    for folder in folderList!.childElementNodes {
+//                        // Get folder
+//                        var identifier: String!
+//                        identifier = (folder as AnyObject).firstNode(matchingSelector: "a")?.attributes["name"]
+//                        identifier = identifier.replacingOccurrences(of: "fl", with: "")
+//                        item.folderId = identifier;
+//                    }
+//                }
+//                
+//                
+//                //                for folder in folderList!.childElementNodes {
+//                //                    guard let classValue = folder.attributes["class"] else { continue }
+//                //                    if classValue.hasPrefix("folder") {
+//                //
+//                //                        // only root folders contains 'header' tag
+//                //                        let isRootFolder = folder.numberOfChildren > 0
+//                //
+//                //                        // identifier
+//                //                        var identifier: String!
+//                //                        identifier = (folder as AnyObject).firstNode(matchingSelector: "a")?.attributes["name"]
+//                //                        identifier = identifier.replacingOccurrences(of: "fl", with: "")
+//                //                        item.folderId = identifier;
+//                //
+//                //
+//                //                        // quality
+//                //                        if (isRootFolder) {
+//                //                            folder.videoQuality = VideoQuality.Undefined
+//                //                        } else {
+//                //                            let qualityString = (folder.searchWithXPathQuery("//div[1]").last as! TFHppleElement).attributes["class"] as! String
+//                //                            if ((qualityString as NSString).rangeOfString("m-hd").location != NSNotFound) {
+//                //                                folder.videoQuality = VideoQuality.HD
+//                //                            } else if ((qualityString as NSString).rangeOfString("m-sd").location != NSNotFound) {
+//                //                                folder.videoQuality = VideoQuality.SD
+//                //                            } else {
+//                //                                folder.videoQuality = VideoQuality.Undefined
+//                //                            }
+//                //                        }
+//                //
+//                //                        // language
+//                //                        if (isRootFolder) {
+//                //                            folder.language = VideoLanguage.Undefined
+//                //                        } else {
+//                //                            let languageString = (folder.searchWithXPathQuery("//div[2]/a[1]").last as! TFHppleElement).attributes["class"] as! String
+//                //                            if ((languageString as NSString).rangeOfString("m-en").location != NSNotFound) {
+//                //                                folder.language = VideoLanguage.EN
+//                //                            } else if ((languageString as NSString).rangeOfString("m-ru").location != NSNotFound) {
+//                //                                folder.language = VideoLanguage.RU
+//                //                            } else if ((languageString as NSString).rangeOfString("m-ua").location != NSNotFound) {
+//                //                                folder.language = VideoLanguage.UA
+//                //                            } else {
+//                //                                folder.language = VideoLanguage.Undefined
+//                //                            }
+//                //                        }
+//                //
+//                //                        folder.details = (folder.childrenWithClassName("material-details").first as! TFHppleElement).text()
+//                //                        folder.size = (folder.childrenWithClassName("material-details").last as! TFHppleElement).text()
+//                //                        folder.dateString = (folder.childrenWithClassName("material-date").last as! TFHppleElement).text()
+//                //
+//                //                        items.append(folder)
+//                //                    } else if (classValue as NSString).range(of: "file").location != NSNotFound {
+//                //                        let file = File()
+//                //
+//                //                        file.name = (folder.searchWithXPathQuery("//span/span").last as! TFHppleElement).text()
+//                //                        file.size = (folder.searchWithXPathQuery("//a/span").last as! TFHppleElement).text()
+//                //
+//                //                        let typeString = folder.attributes["class"] as! String
+//                //                        if ((typeString as NSString).rangeOfString("m-file-new_type_video").location != NSNotFound) {
+//                //                            file.type = FileType.Video
+//                //                        } else if ((typeString as NSString).rangeOfString("m-file-new_type_audio").location != NSNotFound) {
+//                //                            file.type = FileType.Audio
+//                //                        } else {
+//                //                            file.type = FileType.Undefined
+//                //                        }
+//                //
+//                //                        let pathComponent = (folder.searchWithXPathQuery("//a").last as! TFHppleElement)["href"] as! String
+//                //                        let fileURL = NSURL(scheme: "http", host: "brb.to", path: pathComponent)
+//                //                        file.URL = fileURL
+//                //
+//                //                        items.append(file)
+//                //                    }
+//                //                }
+//            }
+//        }
+//    }
 }
