@@ -172,9 +172,9 @@ extension DetailViewController: UITableViewDataSource {
             let cell = tableView.dequeueReusableCell(withIdentifier: "detailsCell", for: indexPath) as! DetailsCell
             cell.yearLabel.text = item.year
             cell.genreLabel.text = item.genre
-//            cell.ratingBar.progress = item.ratingValue!
-//            cell.upVoteLabel.text = item.upVoteValue!
-//            cell.downVoteLabel.text = item.downVoteValue!
+            cell.ratingBar.progress = item.ratingValue!
+            cell.upVoteLabel.text = item.upVoteValue!
+            cell.downVoteLabel.text = item.downVoteValue!
             cell.countryLabel.text = item.country
             cell.directorsName.text = item.director
             cell.actorsName.text = item.actors

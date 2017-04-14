@@ -119,7 +119,7 @@ class ViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         NotificationCenter.default.addObserver(self, selector: #selector(ViewController.reloadMainPageItems(_:)), name:NSNotification.Name(rawValue: "reload"), object: nil)
-        LoadingView.shared.showOverlay(super.view)
+        LoadingView.shared.showOverlay((navigationController?.view)!)
         checkLogin()
         
         self.title = "Main Page"
@@ -135,6 +135,8 @@ class ViewController: UITableViewController {
         definesPresentationContext = true
         tableView.tableHeaderView = searchController.searchBar
         
+        refreshSetup()
+        
         libAPI.loadData()
         tableView.contentOffset = CGPoint(x: 0, y: searchController.searchBar.frame.size.height)
     }
@@ -143,24 +145,19 @@ class ViewController: UITableViewController {
         NotificationCenter.default.removeObserver(self)
     }
     
-//    func getMainPageItems() {
-//        let rows: Array<Dictionary<String, String>> = [["title": "Popular",                "url": "/video/films/?sort=trend"],
-//                    ["title": "Recently Added Movies",  "url": "/video/films/?sort=new"],
-//                    ["title": "Recently Added TV Shows","url": "/video/serials/?sort=new"]]
-//        
-//        mainPageItemsCollection = [MainPageItemsRow]()
-//        mainPageItemsCollection?.reserveCapacity(rows.count)
-//        
-//        for row in rows {
-//            libAPI.getMainItemsRow(at: row["url"]!, success: { (array) in
-//                let itemRow = MainPageItemsRow()
-//                itemRow.row = array
-//                itemRow.title = row["title"]
-//                self.mainPageItemsCollection?.append(itemRow)
-//                self.reloadTable()
-//            })
-//        }
-//    }
+    func refreshSetup() {
+        refreshControl = UIRefreshControl()
+        refreshControl!.tintColor = UIColor.white
+        refreshControl!.attributedTitle = NSAttributedString(string: "Pull to refresh", attributes: [NSForegroundColorAttributeName: UIColor.white])
+        refreshControl!.addTarget(self, action: #selector(ViewController.handleRefresh(_:)), for: UIControlEvents.valueChanged)
+        tableView.addSubview(refreshControl!)
+    }
+    
+    func handleRefresh(_ refreshControl: UIRefreshControl) {
+        mainPageItems?.removeAll()
+        self.tableView.reloadData()
+        libAPI.loadData()
+    }
     
     fileprivate func configureSearchBar() {
         
@@ -176,7 +173,6 @@ class ViewController: UITableViewController {
         searchBarContainer.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|-0-[searchBar]-0-|",
             options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: views))
         
-        //navigationItem.titleView = searchBarContainer
         tableView.tableHeaderView = searchBarContainer
         //footerView.hidden = true
     }
@@ -209,6 +205,9 @@ class ViewController: UITableViewController {
         DispatchQueue.main.async(execute: {
             self.tableView.reloadData()
             LoadingView.shared.hideOverlayView()
+            if (self.refreshControl?.isRefreshing)! {
+                self.refreshControl?.endRefreshing()
+            }
         })
     }
     
@@ -326,13 +325,6 @@ class ViewController: UITableViewController {
         return mainPageItemsRows.count
     }
     
-//    override func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-//        if searchController.active {
-//            return nil
-//        }
-//        return mainPageItemsCollection?[section].title
-//    }
-    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if searchController.isActive {
             return searchResults.count
@@ -437,6 +429,7 @@ extension ViewController: UISearchBarDelegate, UISearchResultsUpdating {
     
     func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
         footerView.isHidden = true
+        refreshControl?.removeFromSuperview()
         reloadTable()
     }
     
@@ -444,6 +437,7 @@ extension ViewController: UISearchBarDelegate, UISearchResultsUpdating {
         searchResults.removeAll()
         searchController.isActive = false
         footerView.isHidden = false
+        refreshSetup()
         reloadTable()
     }
     

@@ -41,6 +41,11 @@ class PersistencyManager: NSObject {
         
     }
     
+    func clearData() {
+        items.removeAll()
+        mainPageItems.removeAll()
+    }
+    
     func saveImage(_ image: UIImage, filename: String) {
         let path = NSHomeDirectory() + "/Documents/\(filename)"
         let data = UIImagePNGRepresentation(image)
