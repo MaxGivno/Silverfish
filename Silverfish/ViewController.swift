@@ -93,12 +93,45 @@ class ViewController: UITableViewController {
     }
     
     func checkLogin() {
-        let siteUrl = URL(string: httpSiteUrl)!
-        guard let cookies = HTTPCookieStorage.shared.cookies(for: siteUrl) else { return }
+        let url = URL(string: httpSiteUrl)!
+        guard let cookies = HTTPCookieStorage.shared.cookies(for: url) else { return }
         
         for cookie in cookies {
-            print(cookie)
+            //print(cookie)
             if cookie.name == "zzm_usess" {
+//                do {
+//                    let json = try JSONSerialization.jsonObject(with: NSData(base64Encoded: cookie.value, options: .init(rawValue: 0))! as Data, options: .allowFragments) as! NSDictionary
+//                    for (key, value) in json {
+//                        print("\(key): \(value)" )
+//                    }
+//                    
+//                } catch let error {
+//                    print(error.localizedDescription)
+//                }
+//                let string = cookie.value.characters.split(separator: ".").map(String.init)
+//                for substring in string {
+//                    let data = NSData(base64Encoded: substring, options: .ignoreUnknownCharacters)
+//                    //let decodedString = String.init(data: data! as Data, encoding: .utf8)
+//                    print(substring)
+//                    print(data!)
+//                }
+//                let data = NSData(base64Encoded: cookie.value, options: .ignoreUnknownCharacters)
+//                print(cookie.value)
+//                print(data!)
+                
+//                let userCreds = cookie.value as NSString
+//                let userCredsDecoded = NSData(data: ((userCreds.removingPercentEncoding)?.data(using: String.Encoding.utf8))!) as Data
+//                do {
+//                    let json = try JSONSerialization.jsonObject(with: userCredsDecoded, options: .mutableContainers) as? [String: Any]
+//                    
+//                    for (key, value) in json! {
+//                        print("\(key): \(value)" )
+//                    }
+//                    //let userName = json?["l"] as! NSString
+//                } catch {
+//                    print(error.localizedDescription)
+//                }
+                
                 self.isLogged = true
                 break
             } else {

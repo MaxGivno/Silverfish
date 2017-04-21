@@ -13,7 +13,7 @@ class HTTPClient {
     
     var headers = [
         "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 10_3 like Mac OS X) AppleWebKit/603.1.30 (KHTML, like Gecko) Mobile/14E277 Safari Line/7.1.3",
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept": "text/html,application/xhtml+xml,application/json,application/xml;q=0.9,*/*;q=0.8",
         "Accept-Language": "ru-RU,ru;q=0.9,en;q=0.8",
         "Accept-Charset": "utf-8, utf-16, *;q=0.1",
         "Accept-Encoding": "identity, *;q=0"
@@ -50,15 +50,19 @@ class HTTPClient {
         
     }
     
-    func HTTPGet(_ url: String, referer: String?, postParams: Dictionary<String, String>?, callback: @escaping (Data?, URLResponse?, String?) -> Void) {
+    func HTTPGet(_ url: String, referer: String?, postParams: [String: String]?, callback: @escaping (Data?, URLResponse?, String?) -> Void) {
         
         //let request = NSMutableURLRequest(url: URL(string: url)!)
         let request = NSMutableURLRequest(url: URL(string: url)!, cachePolicy: NSURLRequest.CachePolicy.returnCacheDataElseLoad, timeoutInterval: 60)
         
         if postParams != nil {
             print("This is POST request")
-            let postParamsEncoded = postParams!.stringFromHttpParameters()
-            request.httpBody = postParamsEncoded.data(using: String.Encoding.utf8)
+            var components = URLComponents()
+            let cs = CharacterSet.urlFragmentAllowed
+            components.percentEncodedFragment = postParams?.map { (key, value) -> String in
+                key.addingPercentEncoding(withAllowedCharacters: cs)! + "=" + value.addingPercentEncoding(withAllowedCharacters: cs)!
+            }.joined(separator: "&")
+            request.httpBody = components.percentEncodedFragment?.data(using: .utf8)
             headers.updateValue("application/x-www-form-urlencoded", forKey: "Content-Type")
             request.httpMethod = "POST"
         } else if headers.index(forKey: "Content-Type") != nil {
@@ -73,6 +77,23 @@ class HTTPClient {
         
         for (index, value) in headers {
             request.setValue(value, forHTTPHeaderField: index)
+        }
+        
+        HTTPsendRequest(request, callback: callback)
+    }
+    
+    func HTTPGetDocumentCookie(url: String, referer: String, options: [String : String]?, callback: @escaping (Data?, URLResponse?, String?) -> Void) {
+        guard let cookies = HTTPCookieStorage.shared.cookies(for: URL(string: url)!) else { return }
+        let request = NSMutableURLRequest(url: URL(string: url)!, cachePolicy: NSURLRequest.CachePolicy.returnCacheDataElseLoad, timeoutInterval: 40)
+        request.addValue(referer, forHTTPHeaderField: "Referer")
+        request.httpMethod = "GET"
+        
+        if let opt = options {
+            request.setValuesForKeys(opt)
+        }
+        
+        for (key, value) in headers {
+            request.setValue(value, forHTTPHeaderField: key)
         }
         
         HTTPsendRequest(request, callback: callback)
